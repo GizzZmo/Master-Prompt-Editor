@@ -1,27 +1,21 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "Backend for The AI Orchestrator",
-  "main": "src/index.ts",
+  "description": "Backend server for Master-Prompt-Editor",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "dev": "nodemon --exec ts-node src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "lint": "eslint . --ext .ts"
   },
-  "keywords": [],
-  "author": "Jon-Arve Constantine Grønsberg-Ovesen",
-  "license": "MIT",
   "dependencies": {
-    "express": "^4.19.2",
-    "cors": "^2.8.5"
+    "express": "^4.19.2"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
-    "@types/node": "^20.12.8",
-    "nodemon": "^3.1.0",
-    "ts-node": "^10.9.2",
+    "@types/node": "^20.14.2",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.4.5"
-
   }
 }
