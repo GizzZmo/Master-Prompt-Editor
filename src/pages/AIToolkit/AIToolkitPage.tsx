@@ -1,10 +1,11 @@
 import React from 'react';
 import { generateAIContent } from '../../utils/api'; // Import the new specific API function
+import { AIConfig } from '../../types/ai'; // Import AIConfig
 
 // Define a type for the data being handled to avoid 'any'
 interface GeneratePayload {
   prompt: string;
-  config: object; // TODO: Define a proper interface for the AI config
+  config: AIConfig; // Use AIConfig type
 }
 
 export function AIToolkitPage() {
