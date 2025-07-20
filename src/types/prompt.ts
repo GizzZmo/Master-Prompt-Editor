@@ -3,19 +3,19 @@ export interface Prompt {
   name: string;
   description: string;
   tags: string[];
-  // FIX: Added content and version to represent the active state
   content: string;
   version: string;
   versions: PromptVersion[];
 }
 
 export interface PromptVersion {
-  // FIX: Added id and promptId for unique identification
   id: string;
   promptId: string;
   version: string;
   content: string;
   createdAt: string;
+  // FIX: Added optional metadata property to match mock data
+  metadata?: Record<string, any>;
 }
 
 export interface PromptCategory {
