@@ -14,8 +14,8 @@ export interface PromptVersion {
   version: string;
   content: string;
   createdAt: string;
-  // FIX: Added optional metadata property to match mock data
-  metadata?: Record<string, any>;
+  // FIX: Replaced 'any' with the safer 'unknown' type.
+  metadata?: Record<string, unknown>;
 }
 
 export interface PromptCategory {
