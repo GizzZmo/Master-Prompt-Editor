@@ -3,16 +3,22 @@ import {
   PromptVersion,
 } from '../../src/types/prompt';
 
-// (Assuming a mock database or actual database service is here)
+// A mock database for demonstration purposes
 const mockPrompts: Prompt[] = [];
 const mockVersions: PromptVersion[] = [];
 
 
 export class PromptService {
-  // ... other methods like getAllPrompts, getPromptById, etc.
+  public async getAllPrompts(): Promise<Prompt[]> {
+    return mockPrompts;
+  }
+
+  public async getPromptById(id: string): Promise<Prompt | undefined> {
+    return mockPrompts.find(p => p.id === id);
+  }
 
   public async getPromptVersions(promptId: string): Promise<PromptVersion[]> {
-    return mockVersions.filter(v => v.promptId === promptId);
+    return mockVersions.filter((v: PromptVersion) => v.promptId === promptId);
   }
 
   public async getPromptVersion(promptId: string, versionId: string): Promise<PromptVersion | undefined> {
