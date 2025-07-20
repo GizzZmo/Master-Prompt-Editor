@@ -2,6 +2,12 @@ import { Prompt, AIWorkflow } from '../../src/types/ai'; // Using frontend types
 
 export const mockPrompts: Prompt[] = [
   {
+    id: '1',
+    name: 'Creative Writing Assistant',
+    content: 'You are a creative writing assistant. Help the user brainstorm ideas for their next story.',
+    version: '1.0.0'
+  },
+  {
     id: 'p-marketing-slogan-001',
     name: 'marketing-slogan-generator-v1.0.0',
     category: 'marketing',
