@@ -1,4 +1,4 @@
-import { Prompt } from '../../src/types/ai'; // FIX: Corrected the relative path to go to the project root
+import { Prompt } from '@/types/ai'; // FIX: Using the new path alias
 
 export const mockPrompts: Prompt[] = [
   {
