@@ -19,7 +19,8 @@ jobs:
         with:
           node-version: '20.x'
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
+          # ✅ Corrected cache path to use package.json files
+          cache-dependency-path: '**/package.json'
 
       - name: Install all dependencies
         run: npm run install:all
