@@ -35,8 +35,11 @@ jobs:
           ls -la
 
       - name: Install all dependencies
-        # This script installs dependencies for the root, server, and client
-        run: npm run install:all
+        # This step now runs the root install command directly
+        run: |
+          npm install
+          npm install --prefix server
+          npm install --prefix client
 
       - name: Debug - Verify eslint installation
         # This step checks if the eslint command is actually available after installation
