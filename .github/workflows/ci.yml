@@ -1,5 +1,3 @@
-# .github/workflows/ci.yml
-
 name: Master-Prompt-Editor CI
 
 on:
@@ -9,30 +7,25 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build_and_lint:
-    name: Build & Lint
+  build_and_test:
+    name: Build, Lint & Test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        # ✅ Corrected cache path to use package.json files
-        cache-dependency-path: '**/package.json'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
 
-    - name: Install all dependencies
-      run: npm run install:all
+      - name: Install all dependencies
+        run: npm run install:all
 
-    - name: Lint project
-      run: npm run lint:all
+      - name: Lint project
+        run: npm run lint:all
 
-    - name: Build all projects
-      run: npm run build:all
+      - name: Build all projects
+        run: npm run build:all
