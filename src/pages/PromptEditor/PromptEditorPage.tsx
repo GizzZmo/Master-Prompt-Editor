@@ -9,18 +9,17 @@ import { Prompt, PromptCategory, PromptVersion } from '../../types/prompt'; // I
 import { usePromptManagement } from '../../hooks/usePromptManagement';
 
 const PromptEditorPage: React.FC = () => {
-  const [promptsList, setPromptsList] = useState<Prompt[]>([]);
   const [newPromptName, setNewPromptName] = useState<string>('');
   const [newPromptCategory, setNewPromptCategory] = useState<PromptCategory>('general'); // Use PromptCategory type
   const [newPromptDomain, setNewPromptDomain] = useState<string>('');
 
-  const { selectedPrompt, isLoading, error, fetchAllPrompts, fetchPrompt, createPrompt, addVersion, rollbackToVersion } = usePromptManagement(); // Destructure correctly
+  const { prompts, selectedPrompt, isLoading, error, fetchAllPrompts, fetchPrompt, createPrompt, addVersion, rollbackToVersion } = usePromptManagement(); // Destructure correctly
   const [promptContent, setPromptContent] = useState<string>('');
 
   // Effect to fetch all prompts on initial load and when a prompt is created/updated/deleted
   useEffect(() => {
     fetchAllPrompts();
-  }, [fetchAllPrompts, selectedPrompt]); // Re-fetch all prompts when selectedPrompt changes (e.g., after save/create)
+  }, [fetchAllPrompts]); // Removed selectedPrompt from dependency to avoid unnecessary re-fetches
 
   // Effect to update promptContent when selectedPrompt changes
   useEffect(() => {
@@ -29,6 +28,9 @@ const PromptEditorPage: React.FC = () => {
       setPromptContent(currentVersionData?.content || '');
     } else {
       setPromptContent(''); // Clear content for new prompt creation
+      setNewPromptName(''); // Reset new prompt fields when no prompt is selected
+      setNewPromptCategory('general');
+      setNewPromptDomain('');
     }
   }, [selectedPrompt]);
 
@@ -60,10 +62,7 @@ const PromptEditorPage: React.FC = () => {
         return;
       }
       await createPrompt(newPromptName, promptContent, newPromptCategory, newPromptDomain);
-      // Reset new prompt fields after creation
-      setNewPromptName('');
-      setNewPromptCategory('general');
-      setNewPromptDomain('');
+      // Reset new prompt fields after creation is handled by the useEffect for selectedPrompt change
     }
   };
 
@@ -75,11 +74,7 @@ const PromptEditorPage: React.FC = () => {
 
   const handleCreateNewPromptClick = () => {
     // Clear selected prompt and reset form for new prompt creation
-    fetchPrompt(''); // This will set selectedPrompt to null
-    setNewPromptName('');
-    setNewPromptCategory('general');
-    setNewPromptDomain('');
-    setPromptContent('');
+    fetchPrompt(''); // This will set selectedPrompt to null, triggering the useEffect to clear fields
   };
 
   return (
@@ -92,14 +87,14 @@ const PromptEditorPage: React.FC = () => {
           <h3>Prompt Repository</h3>
           <p>Centralized repository for all your prompts, categorized by purpose and domain. (2.1)</p>
           <ul style={{ listStyle: 'none', padding: 0 }}>
-            {promptsList.length === 0 && !isLoading && !error ? (
+            {prompts.length === 0 && !isLoading && !error ? (
               <p>No prompts found. Create one!</p>
             ) : isLoading ? (
               <p>Loading prompts...</p>
             ) : error ? (
               <p style={{ color: 'red' }}>Error loading prompts: {error}</p>
             ) : (
-              promptsList.map(p => (
+              prompts.map(p => (
                 <li key={p.id} style={{ marginBottom: '5px' }}>
                   <a href="#" onClick={(e) => { e.preventDefault(); handlePromptSelect(p.id); }}>
                     {p.name} (v{p.currentVersion})
