@@ -21,35 +21,14 @@ jobs:
         with:
           node-version: '20.x'
           cache: 'npm'
-          # Using an explicit list of package.json files for robust caching
+          # FIX: Explicitly list each package.json file for robust caching
           cache-dependency-path: |
             package.json
             client/package.json
             server/package.json
 
-      - name: Debug - List files and versions
-        run: |
-          echo "Node version: $(node --version)"
-          echo "NPM version: $(npm --version)"
-          echo "--- Files in root directory ---"
-          ls -la
-
       - name: Install all dependencies
-        # This step now runs the root install command directly
-        run: |
-          npm install
-          npm install --prefix server
-          npm install --prefix client
-
-      - name: Debug - Verify eslint installation
-        # This step checks if the eslint command is actually available after installation
-        run: |
-          if [ -f "node_modules/.bin/eslint" ]; then
-            echo "✅ eslint binary found in node_modules/.bin/"
-          else
-            echo "❌ eslint binary NOT found. Installation likely failed."
-            exit 1
-          fi
+        run: npm install && npm install --prefix server && npm install --prefix client
 
       - name: Lint project
         run: npm run lint:all
