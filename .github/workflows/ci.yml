@@ -19,9 +19,12 @@ jobs:
         with:
           node-version: '20.x'
           cache: 'npm'
-          cache-dependency-path: '**/package.json'
+          # ✅ FIX: Explicitly list each package.json file for robust caching
+          cache-dependency-path: |
+            package.json
+            client/package.json
+            server/package.json
 
-      # ✅ FIX: This step installs all dependencies, including ESLint
       - name: Install all dependencies
         run: npm run install:all
 
