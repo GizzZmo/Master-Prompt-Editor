@@ -25,11 +25,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        # ✅ Corrected cache path
-        cache-dependency-path: |
-          package-lock.json
-          client/package-lock.json
-          server/package-lock.json
+        # ✅ Corrected cache path to use package.json files
+        cache-dependency-path: '**/package.json'
 
     - name: Install all dependencies
       run: |
