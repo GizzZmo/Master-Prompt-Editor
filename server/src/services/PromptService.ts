@@ -1,12 +1,11 @@
 import {
   Prompt,
   PromptVersion,
-} from '../../src/types/prompt';
+} from '../../../src/types/prompt';
 
 // A mock database for demonstration purposes
 const mockPrompts: Prompt[] = [];
 const mockVersions: PromptVersion[] = [];
-
 
 export class PromptService {
   public async getAllPrompts(): Promise<Prompt[]> {
@@ -17,30 +16,60 @@ export class PromptService {
     return mockPrompts.find(p => p.id === id);
   }
 
-  public async getPromptVersions(promptId: string): Promise<PromptVersion[]> {
-    return mockVersions.filter((v: PromptVersion) => v.promptId === promptId);
+  // FIX: Added missing 'createPrompt' method
+  public async createPrompt(data: Omit<Prompt, 'id' | 'version'>): Promise<Prompt> {
+    const newPrompt: Prompt = {
+      id: `prompt_${Date.now()}`,
+      version: '1.0',
+      ...data,
+    };
+    mockPrompts.push(newPrompt);
+    return newPrompt;
   }
 
-  public async getPromptVersion(promptId: string, versionId: string): Promise<PromptVersion | undefined> {
-    // FIX: Added 'PromptVersion' type to the parameter 'v'
-    return mockVersions.find((v: PromptVersion) => v.promptId === promptId && v.id === versionId);
-  }
-
-  public async createPromptVersion(promptId: string, content: string): Promise<PromptVersion> {
-    const latestVersion = mockVersions
-      .filter((v: PromptVersion) => v.promptId === promptId) // FIX: Added 'PromptVersion' type
-      .sort((a, b) => (b.version > a.version ? 1 : -1))[0];
-
-    const newVersionNumber = latestVersion ? parseFloat(latestVersion.version) + 0.1 : 1.0;
-
+  // FIX: Added missing 'addPromptVersion' method
+  public async addPromptVersion(promptId: string, content: string): Promise<PromptVersion> {
     const newVersion: PromptVersion = {
-      id: `v${Date.now()}`,
+      id: `v_${Date.now()}`,
       promptId,
-      version: newVersionNumber.toFixed(1),
+      version: (Math.random() + 1).toString().substring(2, 5), // Mock version
       content,
       createdAt: new Date().toISOString(),
     };
     mockVersions.push(newVersion);
     return newVersion;
+  }
+
+  // FIX: Added missing 'rollbackPromptToVersion' method
+  public async rollbackPromptToVersion(promptId: string, versionId: string): Promise<Prompt | null> {
+    const targetVersion = mockVersions.find(v => v.id === versionId && v.promptId === promptId);
+    const prompt = mockPrompts.find(p => p.id === promptId);
+
+    if (targetVersion && prompt) {
+      prompt.content = targetVersion.content;
+      prompt.version = targetVersion.version;
+      return prompt;
+    }
+    return null;
+  }
+
+  // FIX: Added missing 'updatePromptMetadata' method
+  public async updatePromptMetadata(promptId: string, metadata: Partial<Prompt>): Promise<Prompt | null> {
+      const prompt = mockPrompts.find(p => p.id === promptId);
+      if (prompt) {
+          Object.assign(prompt, metadata);
+          return prompt;
+      }
+      return null;
+  }
+
+  // FIX: Added missing 'deletePrompt' method
+  public async deletePrompt(promptId: string): Promise<{ success: boolean }> {
+    const index = mockPrompts.findIndex(p => p.id === promptId);
+    if (index > -1) {
+      mockPrompts.splice(index, 1);
+      return { success: true };
+    }
+    return { success: false };
   }
 }
