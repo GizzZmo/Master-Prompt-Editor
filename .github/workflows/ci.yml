@@ -1,13 +1,16 @@
+# .github/workflows/ci.yml
+
 name: Master-Prompt-Editor CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
-  build_and_test:
+  build_and_lint:
+    name: Build & Lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -22,21 +25,16 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
 
-    - name: Install root dependencies
-      run: npm install
+    - name: Install all dependencies
+      run: |
+        npm install
+        npm install --prefix server
+        npm install --prefix client
 
-    - name: Install server dependencies
-      run: npm install --prefix server
+    - name: Lint project
+      run: npm run lint:all
 
-    - name: Install client dependencies
-      run: npm install --prefix client
-
-    - name: Lint code
-      run: npm run lint --if-present
-
-    - name: Build server
-      run: npm run build --prefix server --if-present
-
-    - name: Build client
-      run: npm run build --prefix client --if-present
+    - name: Build all projects
+      run: npm run build:all
