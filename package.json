@@ -8,7 +8,7 @@
     "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
-    "lint:all": "npm run lint --prefix server && npm run lint --prefix client",
+    "lint:all": "eslint . --ext .ts,.tsx",
     "build:all": "npm run build --prefix server && npm run build --prefix client"
   },
   "devDependencies": {
