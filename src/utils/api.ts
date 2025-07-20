@@ -1,18 +1,19 @@
-import { AIResponse, AIModelType, AITaskExecutionLog, AIWorkflow, AIWorkflowStep } from '../types/ai';
-import { Prompt, PromptVersion, PromptEvaluationResult, PromptOptimizationStrategy, PromptCategory, LLMCallLog } from '../types/prompt';
+import { AIResponse, AIModelType, AITaskExecutionLog, AIWorkflow } from '../types/ai';
+import { Prompt, PromptVersion, PromptEvaluationResult, PromptOptimizationStrategy, PromptCategory } from '../types/prompt'; // Removed unused LLMCallLog import
 
 const BASE_URL = 'http://localhost:3001/api';
 
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
-async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+// Unified API response type (using AIResponse from src/types/ai)
+async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<AIResponse<T>> {
   const url = `${BASE_URL}${endpoint}`;
   try {
     const response = await fetch(url, options);
+
+    // Handle 204 No Content for delete operations
+    if (response.status === 204) {
+      return { success: true };
+    }
+
     const jsonResponse = await response.json();
 
     if (!response.ok) {
@@ -28,24 +29,24 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<A
 }
 
 export const api = {
-  get: async <T>(endpoint: string): Promise<ApiResponse<T>> => {
+  get: async <T>(endpoint: string): Promise<AIResponse<T>> => {
     return apiRequest<T>(endpoint);
   },
-  post: async <T, U>(endpoint: string, body: U): Promise<ApiResponse<T>> => {
+  post: async <T, U>(endpoint: string, body: U): Promise<AIResponse<T>> => {
     return apiRequest<T>(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
   },
-  put: async <T, U>(endpoint: string, body: U): Promise<ApiResponse<T>> => {
+  put: async <T, U>(endpoint: string, body: U): Promise<AIResponse<T>> => {
     return apiRequest<T>(endpoint, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
   },
-  delete: async <T>(endpoint: string): Promise<ApiResponse<T>> => {
+  delete: async <T>(endpoint: string): Promise<AIResponse<T>> => {
     return apiRequest<T>(endpoint, {
       method: 'DELETE',
     });
@@ -53,32 +54,32 @@ export const api = {
 };
 
 // Specific API functions for Prompts
-export const getPrompts = (): Promise<ApiResponse<Prompt[]>> => api.get<Prompt[]>('/prompts');
-export const getPromptById = (id: string): Promise<ApiResponse<Prompt>> => api.get<Prompt>(`/prompts/${id}`);
-export const createPrompt = (name: string, initialContent: string, category: PromptCategory, domain: string): Promise<ApiResponse<Prompt>> => {
+export const getPrompts = (): Promise<AIResponse<Prompt[]>> => api.get<Prompt[]>('/prompts');
+export const getPromptById = (id: string): Promise<AIResponse<Prompt>> => api.get<Prompt>(`/prompts/${id}`);
+export const createPrompt = (name: string, initialContent: string, category: PromptCategory, domain: string): Promise<AIResponse<Prompt>> => {
   return api.post<Prompt, { name: string; initialContent: string; category: PromptCategory; domain: string; }>('/prompts', { name, initialContent, category, domain });
 };
 
-export const addPromptVersion = (promptId: string, content: string, metadata: Omit<PromptVersion['metadata'], 'createdAt' | 'lastModified'>): Promise<ApiResponse<Prompt>> => {
+export const addPromptVersion = (promptId: string, content: string, metadata: Omit<PromptVersion['metadata'], 'createdAt' | 'lastModified'>): Promise<AIResponse<Prompt>> => {
   return api.post<Prompt, { content: string; metadata: Omit<PromptVersion['metadata'], 'createdAt' | 'lastModified'> }>(`/prompts/${promptId}/versions`, { content, metadata });
 };
 
-export const rollbackPromptVersion = (promptId: string, version: string): Promise<ApiResponse<Prompt>> => {
+export const rollbackPromptVersion = (promptId: string, version: string): Promise<AIResponse<Prompt>> => {
   return api.post<Prompt, { version: string }>(`/prompts/${promptId}/rollback`, { version });
 };
 
-export const updatePromptMetadata = (promptId: string, updates: Partial<Omit<Prompt, 'id' | 'currentVersion' | 'versions'>>): Promise<ApiResponse<Prompt>> => {
+export const updatePromptMetadata = (promptId: string, updates: Partial<Omit<Prompt, 'id' | 'currentVersion' | 'versions'>>): Promise<AIResponse<Prompt>> => {
   return api.put<Prompt, Partial<Omit<Prompt, 'id' | 'currentVersion' | 'versions'>>>(`/prompts/${promptId}`, updates);
 };
 
-export const deletePrompt = (promptId: string): Promise<ApiResponse<void>> => api.delete<void>(`/prompts/${promptId}`);
+export const deletePrompt = (promptId: string): Promise<AIResponse<void>> => api.delete<void>(`/prompts/${promptId}`);
 
-export const optimizePrompt = (promptId: string, strategy: PromptOptimizationStrategy): Promise<AIResponse<any>> => {
-  return api.post<any, { strategy: PromptOptimizationStrategy }>(`/prompts/${promptId}/optimize`, { strategy });
+export const optimizePrompt = (promptId: string, strategy: PromptOptimizationStrategy): Promise<AIResponse<unknown>> => {
+  return api.post<unknown, { strategy: PromptOptimizationStrategy }>(`/prompts/${promptId}/optimize`, { strategy });
 };
 
-export const evaluatePrompt = (promptId: string, result: PromptEvaluationResult): Promise<AIResponse<any>> => {
-  return api.post<any, PromptEvaluationResult>(`/prompts/${promptId}/evaluate`, result);
+export const evaluatePrompt = (promptId: string, result: PromptEvaluationResult): Promise<AIResponse<unknown>> => {
+  return api.post<unknown, PromptEvaluationResult>(`/prompts/${promptId}/evaluate`, result);
 };
 
 // Specific API functions for AI Toolkit
@@ -112,6 +113,6 @@ export const executeWorkflow = (workflowId: string, inputData: Record<string, an
   return api.post<AITaskExecutionLog, { workflowId: string; inputData: Record<string, any> }>('/ai/workflows/execute', { workflowId, inputData });
 };
 
-export const generateAIContent = (prompt: string, config: any): Promise<AIResponse<any>> => {
-  return api.post<any, { prompt: string; config: any }>('/ai/generate', { prompt, config });
+export const generateAIContent = (prompt: string, config: AIConfig): Promise<AIResponse<unknown>> => {
+  return api.post<unknown, { prompt: string; config: AIConfig }>('/ai/generate', { prompt, config });
 };
