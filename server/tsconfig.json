@@ -4,17 +4,15 @@
     "module": "commonjs",
     "rootDir": "./src",
     "outDir": "./dist",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "composite": true,
     "strict": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-
-    // --- FIX: Add these lines for path aliases ---
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["../src/*"]
-    }
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "references": [
+    { "path": "../../src/types" }
+  ]
 }
