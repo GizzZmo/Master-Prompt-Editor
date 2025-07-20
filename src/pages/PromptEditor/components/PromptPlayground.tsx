@@ -1,24 +1,40 @@
 import React, { useState } from 'react';
-// FIX: Removed unused 'MultimodalOutput' import
 import { api } from '../../../utils/api';
 
-// Define the expected shape of the API response
 interface PlaygroundResult {
   outputText: string;
 }
 
 export function PromptPlayground() {
   const [result, setResult] = useState<PlaygroundResult | null>(null);
+  const [prompt, setPrompt] = useState('');
 
-  // FIX: Replaced 'any' with a specific type for the prompt data
-  const handleRun = async (promptData: { content: string }) => {
-    const apiResult = await api.post('/prompts/run', promptData);
+  const handleRun = async () => {
+    if (!prompt) return;
+    const apiResult = await api.post<PlaygroundResult, { content: string }>(
+      '/prompts/run',
+      { content: prompt }
+    );
     setResult(apiResult);
   };
 
   return (
     <div>
-      {/* ... playground UI ... */}
+      <h3>Playground</h3>
+      <textarea
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        placeholder="Enter your prompt here..."
+        rows={5}
+        style={{ width: '100%', marginBottom: '10px' }}
+      />
+      <button onClick={handleRun}>Run</button>
+      {result && (
+        <div style={{ marginTop: '20px' }}>
+          <h4>Result:</h4>
+          <pre>{result.outputText}</pre>
+        </div>
+      )}
     </div>
   );
 }
