@@ -1,141 +1,68 @@
 import { Router, Request, Response } from 'express';
 import { PromptService } from '../services/PromptService';
-import { Prompt, PromptVersion, PromptCategory } from '../../../src/types/prompt'; // Corrected import path and types
+import { Prompt } from '../../../src/types/prompt';
 
 const router = Router();
 const promptService = new PromptService();
 
-type NewPromptRequest = Omit<Prompt, 'id' | 'currentVersion' | 'versions'> & {initialContent: string};
-
+// GET /api/prompts
 router.get('/', async (_req: Request, res: Response) => {
-  try {
-    const prompts = await promptService.getAllPrompts();
-    res.status(200).json(prompts);
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    res.status(500).json({ error: 'Failed to retrieve prompts', details: errorMessage });
-  }
+  const prompts = await promptService.getAllPrompts();
+  res.json(prompts);
 });
 
+// GET /api/prompts/:id
 router.get('/:id', async (req: Request, res: Response) => {
-  try {
-    const prompt = await promptService.getPromptById(req.params.id);
-    if (prompt) {
-      res.status(200).json(prompt);
-    } else {
-      res.status(404).json({ message: 'Prompt not found' });
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    res.status(500).json({ error: 'Failed to retrieve prompt', details: errorMessage });
+  const prompt = await promptService.getPromptById(req.params.id);
+  if (prompt) {
+    res.json(prompt);
+  } else {
+    res.status(404).json({ message: 'Prompt not found' });
   }
 });
 
+// POST /api/prompts
 router.post('/', async (req: Request, res: Response) => {
-  try {
-    // Expecting name, category, domain, and initialContent for a brand new prompt
-    const newPromptData: NewPromptRequest = req.body;
-    const createdPrompt = await promptService.createPrompt(newPromptData);
-    res.status(201).json(createdPrompt);
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    res.status(500).json({ error: 'Failed to create prompt', details: errorMessage });
-  }
+  const newPromptData: Omit<Prompt, 'id' | 'version'> = req.body;
+  const createdPrompt = await promptService.createPrompt(newPromptData);
+  res.status(201).json(createdPrompt);
 });
 
-// New endpoint to add a new version to an existing prompt
+// POST /api/prompts/:id/versions
 router.post('/:id/versions', async (req: Request, res: Response) => {
-  try {
-    const { content, metadata } = req.body;
-    if (!content || !metadata) {
-      return res.status(400).json({ error: 'Content and metadata are required for a new version.' });
-    }
-    const updatedPrompt = await promptService.addPromptVersion(req.params.id, content, metadata);
-    if (updatedPrompt) {
-      res.status(200).json(updatedPrompt);
-    } else {
-      res.status(404).json({ message: 'Prompt not found or failed to add version.' });
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    res.status(500).json({ error: 'Failed to add prompt version', details: errorMessage });
-  }
+    const { content } = req.body;
+    const newVersion = await promptService.addPromptVersion(req.params.id, content);
+    res.status(201).json(newVersion);
 });
 
-// New endpoint to rollback to a specific version
-router.post('/:id/rollback', async (req: Request, res: Response) => {
-  try {
-    const { version } = req.body;
-    if (!version) {
-      return res.status(400).json({ error: 'Version to rollback to is required.' });
-    }
-    const updatedPrompt = await promptService.rollbackPromptToVersion(req.params.id, version);
-    if (updatedPrompt) {
-      res.status(200).json(updatedPrompt);
+// POST /api/prompts/:id/rollback/:versionId
+router.post('/:id/rollback/:versionId', async (req: Request, res: Response) => {
+    const updatedPrompt = await promptService.rollbackPromptToVersion(req.params.id, req.params.versionId);
+    if(updatedPrompt) {
+        res.json(updatedPrompt);
     } else {
-      res.status(404).json({ message: 'Prompt not found or version not found.' });
+        res.status(404).json({ message: 'Prompt or version not found' });
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    res.status(500).json({ error: 'Failed to rollback prompt', details: errorMessage });
-  }
 });
 
-// New endpoint to update an existing prompt's metadata (excluding content and versions)
-router.put('/:id', async (req: Request, res: Response) => {
-  try {
-    const updates = req.body;
-    const updatedPrompt = await promptService.updatePromptMetadata(req.params.id, updates);
+// PATCH /api/prompts/:id
+router.patch('/:id', async (req: Request, res: Response) => {
+    const updatedPrompt = await promptService.updatePromptMetadata(req.params.id, req.body);
     if (updatedPrompt) {
-      res.status(200).json(updatedPrompt);
+        res.json(updatedPrompt);
     } else {
-      res.status(404).json({ message: 'Prompt not found or failed to update.' });
+        res.status(404).json({ message: 'Prompt not found' });
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    res.status(500).json({ error: 'Failed to update prompt', details: errorMessage });
-  }
 });
 
-// New endpoint to delete a prompt
+// DELETE /api/prompts/:id
 router.delete('/:id', async (req: Request, res: Response) => {
-  try {
-    const success = await promptService.deletePrompt(req.params.id);
-    if (success) {
-      res.status(204).send(); // No Content
+    const result = await promptService.deletePrompt(req.params.id);
+    if (result.success) {
+        res.status(204).send();
     } else {
-      res.status(404).json({ message: 'Prompt not found' });
+        res.status(404).json({ message: 'Prompt not found' });
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    res.status(500).json({ error: 'Failed to delete prompt', details: errorMessage });
-  }
-});
-
-// Placeholder for prompt evaluation endpoint
-router.post('/:id/evaluate', async (req: Request, res: Response) => {
-  try {
-    const evaluationResult = req.body;
-    // In a real app, this would trigger an evaluation process and store results
-    console.log(`Received evaluation for prompt ${req.params.id}:`, evaluationResult);
-    res.status(200).json({ success: true, message: 'Evaluation received' });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    res.status(500).json({ error: 'Failed to process evaluation', details: errorMessage });
-  }
-});
-
-// Placeholder for prompt optimization endpoint
-router.post('/:id/optimize', async (req: Request, res: Response) => {
-  try {
-    const optimizationStrategy = req.body.strategy;
-    // In a real app, this would trigger an optimization process
-    console.log(`Received optimization request for prompt ${req.params.id} with strategy:`, optimizationStrategy);
-    res.status(200).json({ success: true, message: 'Optimization request received' });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    res.status(500).json({ error: 'Failed to process optimization', details: errorMessage });
-  }
 });
 
 export default router;
