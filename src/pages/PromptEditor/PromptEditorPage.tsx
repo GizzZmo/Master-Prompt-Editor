@@ -1,41 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import PromptInputArea from './components/PromptInputArea';
 import PromptVersioningPanel from './components/PromptVersioningPanel';
-import PromptPlayground from './components/PromptPlayground';
+import { PromptPlayground } from './components/PromptPlayground'; // Named import
 import PromptOptimizationSettings from './components/PromptOptimizationSettings';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
-import { Prompt } from '../../types/prompt';
+import { Prompt, PromptCategory, PromptVersion } from '../../types/prompt'; // Import PromptCategory and PromptVersion
 import { usePromptManagement } from '../../hooks/usePromptManagement';
-import { getPrompts } from '../../utils/api';
 
 const PromptEditorPage: React.FC = () => {
   const [promptsList, setPromptsList] = useState<Prompt[]>([]);
   const [newPromptName, setNewPromptName] = useState<string>('');
-  const [newPromptCategory, setNewPromptCategory] = useState<Prompt['category']>('general');
+  const [newPromptCategory, setNewPromptCategory] = useState<PromptCategory>('general'); // Use PromptCategory type
   const [newPromptDomain, setNewPromptDomain] = useState<string>('');
 
-  const { prompt: selectedPrompt, loading, error, fetchPrompt, createPrompt, addVersion, rollbackToVersion } = usePromptManagement();
+  const { selectedPrompt, isLoading, error, fetchAllPrompts, fetchPrompt, createPrompt, addVersion, rollbackToVersion } = usePromptManagement(); // Destructure correctly
   const [promptContent, setPromptContent] = useState<string>('');
 
+  // Effect to fetch all prompts on initial load and when a prompt is created/updated/deleted
+  useEffect(() => {
+    fetchAllPrompts();
+  }, [fetchAllPrompts, selectedPrompt]); // Re-fetch all prompts when selectedPrompt changes (e.g., after save/create)
+
+  // Effect to update promptContent when selectedPrompt changes
   useEffect(() => {
     if (selectedPrompt) {
-      setPromptContent(selectedPrompt.versions.find(v => v.version === selectedPrompt.currentVersion)?.content || '');
+      const currentVersionData = selectedPrompt.versions.find(v => v.version === selectedPrompt.currentVersion);
+      setPromptContent(currentVersionData?.content || '');
     } else {
-      setPromptContent('');
+      setPromptContent(''); // Clear content for new prompt creation
     }
-  }, [selectedPrompt]);
-
-  useEffect(() => {
-    const fetchAllPrompts = async () => {
-      const response = await getPrompts();
-      if (response.success && response.data) {
-        setPromptsList(response.data);
-      } else {
-        console.error("Failed to fetch prompts list:", response.error);
-      }
-    };
-    fetchAllPrompts();
   }, [selectedPrompt]);
 
   const handlePromptSelect = async (promptId: string) => {
@@ -43,24 +37,30 @@ const PromptEditorPage: React.FC = () => {
   };
 
   const handleSavePrompt = async () => {
+    if (isLoading) return; // Prevent multiple saves
+
     if (selectedPrompt) {
-      const currentContent = selectedPrompt.versions.find(v => v.version === selectedPrompt.currentVersion)?.content;
+      const currentVersionData = selectedPrompt.versions.find(v => v.version === selectedPrompt.currentVersion);
+      const currentContent = currentVersionData?.content;
+
       if (promptContent === currentContent) {
           alert('No changes detected in prompt content. Not creating a new version.');
           return;
       }
-
+      // Add a new version
       await addVersion(selectedPrompt.id, promptContent, {
-        expectedOutcome: '',
-        rationale: 'Manual edit from editor',
-        author: 'current_user'
+        expectedOutcome: currentVersionData?.metadata.expectedOutcome || '', // Preserve previous metadata or prompt for new
+        rationale: 'Manual edit from editor, new version created',
+        author: 'current_user' // Replace with actual user info
       });
-    } else {
+
+    } else { // Create a new prompt
       if (!newPromptName.trim() || !promptContent.trim()) {
-        alert('Please provide a name and initial content for the new prompt.');
+        alert('Please provide a name, category, domain and initial content for the new prompt.');
         return;
       }
       await createPrompt(newPromptName, promptContent, newPromptCategory, newPromptDomain);
+      // Reset new prompt fields after creation
       setNewPromptName('');
       setNewPromptCategory('general');
       setNewPromptDomain('');
@@ -74,7 +74,8 @@ const PromptEditorPage: React.FC = () => {
   };
 
   const handleCreateNewPromptClick = () => {
-    fetchPrompt('');
+    // Clear selected prompt and reset form for new prompt creation
+    fetchPrompt(''); // This will set selectedPrompt to null
     setNewPromptName('');
     setNewPromptCategory('general');
     setNewPromptDomain('');
@@ -90,14 +91,22 @@ const PromptEditorPage: React.FC = () => {
         <div style={{ flex: 1, border: '1px solid #e9ecef', padding: '20px', borderRadius: '8px', backgroundColor: 'white' }}>
           <h3>Prompt Repository</h3>
           <p>Centralized repository for all your prompts, categorized by purpose and domain. (2.1)</p>
-          <ul>
-            {promptsList.map(p => (
-              <li key={p.id} style={{ marginBottom: '5px' }}>
-                <a href="#" onClick={(e) => { e.preventDefault(); handlePromptSelect(p.id); }}>
-                  {p.name} (v{p.currentVersion})
-                </a>
-              </li>
-            ))}
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {promptsList.length === 0 && !isLoading && !error ? (
+              <p>No prompts found. Create one!</p>
+            ) : isLoading ? (
+              <p>Loading prompts...</p>
+            ) : error ? (
+              <p style={{ color: 'red' }}>Error loading prompts: {error}</p>
+            ) : (
+              promptsList.map(p => (
+                <li key={p.id} style={{ marginBottom: '5px' }}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); handlePromptSelect(p.id); }}>
+                    {p.name} (v{p.currentVersion})
+                  </a>
+                </li>
+              ))
+            )}
             <li><Button onClick={handleCreateNewPromptClick} style={{ marginTop: '10px' }}>Create New Prompt</Button></li>
           </ul>
         </div>
@@ -110,7 +119,7 @@ const PromptEditorPage: React.FC = () => {
                 <Input label="New Prompt Name" value={newPromptName} onChange={(e) => setNewPromptName(e.target.value)} placeholder="e.g., 'marketing-email-draft'" />
                 <div style={{marginBottom: '15px'}}>
                   <label htmlFor="new-prompt-category">Category:</label>
-                  <select id="new-prompt-category" value={newPromptCategory} onChange={(e) => setNewPromptCategory(e.target.value as Prompt['category'])} style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '100%' }}>
+                  <select id="new-prompt-category" value={newPromptCategory} onChange={(e) => setNewPromptCategory(e.target.value as PromptCategory)} style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '100%' }}>
                     <option value="general">General</option>
                     <option value="marketing">Marketing</option>
                     <option value="human-resources">Human Resources</option>
@@ -124,7 +133,7 @@ const PromptEditorPage: React.FC = () => {
               promptContent={promptContent}
               onPromptContentChange={setPromptContent}
             />
-            {loading && <p>Saving...</p>}
+            {isLoading && <p>Processing...</p>}
             {error && <p style={{color: 'red'}}>Error: {error}</p>}
             <Button onClick={handleSavePrompt} style={{ marginTop: '10px' }}>
               {selectedPrompt ? 'Save New Version' : 'Create Prompt'}
@@ -149,7 +158,7 @@ const PromptEditorPage: React.FC = () => {
           {selectedPrompt ? (
             <PromptVersioningPanel
               currentVersion={selectedPrompt.currentVersion}
-              versionHistory={selectedPrompt.versions.map(v => ({ version: v.version, date: v.metadata.lastModified }))}
+              versionHistory={selectedPrompt.versions.map(v => ({ version: v.version, date: v.metadata.lastModified, rationale: v.metadata.rationale }))}
               onRollback={handleRollback}
             />
           ) : (

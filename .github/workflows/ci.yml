@@ -29,10 +29,7 @@ jobs:
         cache-dependency-path: '**/package.json'
 
     - name: Install all dependencies
-      run: |
-        npm install
-        npm install --prefix server
-        npm install --prefix client
+      run: npm run install:all
 
     - name: Lint project
       run: npm run lint:all

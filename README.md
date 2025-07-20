@@ -19,7 +19,7 @@ This project is structured as a monorepo containing both a frontend (React/TypeS
 ```
 . # Root Directory
 ├── public/             # Public assets (e.g., index.html)
-├── src/                # Frontend Source Code
+├── src/                # Frontend Source Code (React/TypeScript)
 │   ├── assets/         # Static assets like images
 │   ├── components/     # Reusable UI components
 │   │   ├── layout/     # Layout-specific components (Header, Sidebar)
@@ -30,7 +30,7 @@ This project is structured as a monorepo containing both a frontend (React/TypeS
 │   │   ├── AIToolkit/  # Advanced AI Toolkit module
 │   │   └── PromptEditor/ # Master Prompt Editor module
 │   ├── styles/         # Global styles
-│   ├── types/          # TypeScript type definitions
+│   ├── types/          # TypeScript type definitions (shared)
 │   ├── utils/          # Utility functions (e.g., API calls)
 │   ├── App.tsx         # Main application component
 │   └── index.tsx       # Entry point for React app
@@ -80,14 +80,13 @@ To run this project, you would typically follow these steps:
     `cd [project-folder]`
 
 2.  **Install dependencies (root, frontend, and backend):**
-    `npm install` (in root)
-    `cd server && npm install && cd ..`
+    `npm run install:all`
 
-3.  **Start the backend server:**
-    `npm run start:server` (or `npm run dev:server` for development with watch)
-
-4.  **Start the frontend application:**
-    `npm run start:client` (or `npm run dev:client` for development with watch)
+3.  **Start the development servers (frontend and backend concurrently):**
+    `npm run dev`
+    *   (Alternatively, for separate starts:)
+    *   Start the backend server: `npm run dev:server`
+    *   Start the frontend application: `npm run dev:client`
 
 (Note: These commands are conceptual and depend on the actual `package.json` scripts implemented.)
 

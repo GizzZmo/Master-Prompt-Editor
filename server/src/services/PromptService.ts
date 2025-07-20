@@ -1,18 +1,13 @@
 // server/src/services/PromptService.ts
 
-// Define a reusable type for a Prompt
-interface Prompt {
-  id: string;
-  name: string;
-  content: string;
-  version: string;
-}
-
-// Define a type for data used to create a new prompt
-type NewPromptData = Omit<Prompt, 'id' | 'version'>;
+import { Prompt, PromptVersion, PromptCategory, LLMCallLog, PromptEvaluationResult, PromptOptimizationStrategy } from '../../../src/types/prompt'; // Corrected import path and types
+import { mockPrompts } from '../data/mockPrompts';
 
 // A mock database for demonstration purposes
-const mockDatabase: Map<string, Prompt> = new Map();
+const mockDatabase: Map<string, Prompt> = new Map(mockPrompts.map(p => [p.id, p]));
+
+// Type for data used to create a new prompt
+type NewPromptRequestData = Omit<Prompt, 'id' | 'currentVersion' | 'versions'> & { initialContent: string; };
 
 export class PromptService {
   /**
@@ -32,35 +27,118 @@ export class PromptService {
   /**
    * Creates a new prompt.
    */
-  public async createPrompt(data: NewPromptData): Promise<Prompt> {
+  public async createPrompt(data: NewPromptRequestData): Promise<Prompt> {
     const id = `prompt_${Date.now()}`;
+    const initialVersion: PromptVersion = {
+      version: '1.0.0',
+      content: data.initialContent,
+      metadata: {
+        expectedOutcome: 'Define expected outcome here',
+        rationale: 'Initial creation',
+        author: 'System',
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      },
+    };
+
     const newPrompt: Prompt = {
       id,
-      ...data,
-      version: '1.0.0',
+      name: data.name,
+      category: data.category,
+      domain: data.domain,
+      currentVersion: initialVersion.version,
+      versions: [initialVersion],
     };
     mockDatabase.set(id, newPrompt);
     return newPrompt;
   }
 
   /**
-   * Updates an existing prompt.
+   * Adds a new version to an existing prompt.
    */
-  public async updatePrompt(id: string, updates: Partial<NewPromptData>): Promise<Prompt | null> {
+  public async addPromptVersion(promptId: string, content: string, metadata: Omit<PromptVersion['metadata'], 'createdAt' | 'lastModified'>): Promise<Prompt | null> {
+    const existingPrompt = mockDatabase.get(promptId);
+    if (!existingPrompt) {
+      return null;
+    }
+
+    const [major, minor, patch] = existingPrompt.currentVersion.split('.').map(Number);
+    // Increment minor version for new content, reset patch
+    const newVersionString = `${major}.${minor + 1}.0`;
+
+    const newVersion: PromptVersion = {
+      version: newVersionString,
+      content,
+      metadata: {
+        ...metadata,
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      },
+    };
+
+    const updatedPrompt: Prompt = {
+      ...existingPrompt,
+      currentVersion: newVersionString,
+      versions: [...existingPrompt.versions, newVersion],
+    };
+
+    mockDatabase.set(promptId, updatedPrompt);
+    return updatedPrompt;
+  }
+
+  /**
+   * Rolls back a prompt to a specific version.
+   */
+  public async rollbackPromptToVersion(promptId: string, targetVersion: string): Promise<Prompt | null> {
+    const existingPrompt = mockDatabase.get(promptId);
+    if (!existingPrompt) {
+      return null;
+    }
+
+    const targetPromptVersion = existingPrompt.versions.find(v => v.version === targetVersion);
+    if (!targetPromptVersion) {
+      return null; // Target version not found
+    }
+
+    const updatedPrompt: Prompt = {
+      ...existingPrompt,
+      currentVersion: targetVersion,
+      // Conceptually, we don't remove future versions for rollback, just change 'currentVersion'
+      // If strict rollback (removing future versions) is needed, modify 'versions' array here.
+    };
+    mockDatabase.set(promptId, updatedPrompt);
+    return updatedPrompt;
+  }
+
+  /**
+   * Updates an existing prompt's metadata (excluding content and versions directly).
+   * This might be used for updating name, category, domain without creating a new version.
+   */
+  public async updatePromptMetadata(id: string, updates: Partial<Omit<Prompt, 'id' | 'currentVersion' | 'versions'>>): Promise<Prompt | null> {
     const existingPrompt = mockDatabase.get(id);
     if (!existingPrompt) {
       return null;
     }
 
-    // FIX: Changed 'let' to 'const' as 'major' is not reassigned.
-    const [major] = existingPrompt.version.split('.').map(Number);
-    const newVersion = `${major + 1}.0.0`;
-
     const updatedPrompt: Prompt = {
       ...existingPrompt,
       ...updates,
-      version: newVersion,
+      // When updating metadata, we usually don't change the version number
+      // unless the name change implies a significant shift.
+      // For now, no version increment here.
     };
+
+    // Also update the lastModified of the current version if the underlying content metadata changes
+    const currentVersionIndex = updatedPrompt.versions.findIndex(v => v.version === updatedPrompt.currentVersion);
+    if (currentVersionIndex !== -1) {
+      updatedPrompt.versions[currentVersionIndex] = {
+        ...updatedPrompt.versions[currentVersionIndex],
+        metadata: {
+          ...updatedPrompt.versions[currentVersionIndex].metadata,
+          lastModified: new Date().toISOString(),
+        },
+      };
+    }
 
     mockDatabase.set(id, updatedPrompt);
     return updatedPrompt;
@@ -77,7 +155,6 @@ export class PromptService {
    * Placeholder for a method that was possibly empty.
    */
   public async someOtherMethod() {
-    // FIX: Added a comment to explain why the block is empty, resolving the 'no-empty' error.
     // This method is a placeholder for future functionality.
   }
 }

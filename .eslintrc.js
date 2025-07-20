@@ -1,4 +1,3 @@
-// .eslintrc.js
 module.exports = {
   root: true,
   env: {
@@ -18,7 +17,7 @@ module.exports = {
   overrides: [
     {
       // ✅ Rules specifically for your React client files
-      files: ['client/src/**/*.{ts,tsx}'],
+      files: ['client/src/**/*.{ts,tsx}', 'src/**/*.{ts,tsx}'],
       extends: [
         'plugin:react-hooks/recommended',
         'plugin:react/recommended',
