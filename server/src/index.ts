@@ -1,25 +1,23 @@
-import express from 'express';
-import cors from 'cors';
-import promptRoutes from './routes/promptRoutes';
+import express, { Request, Response } from 'express';
+import cors from 'cors'; // FIX: Added cors import
 import aiRoutes from './routes/aiRoutes';
-import { PORT } from './config';
+import promptRoutes from './routes/promptRoutes';
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors()); // Enable CORS for frontend communication
-app.use(express.json()); // Enable JSON body parsing
+app.use(cors()); // FIX: Enabled CORS
+app.use(express.json());
 
-// Routes
-app.use('/api/prompts', promptRoutes);
+// API Routes
 app.use('/api/ai', aiRoutes);
+app.use('/api/prompts', promptRoutes);
 
-// Root route
-app.get('/', (req, res) => {
-  res.send('AI Orchestrator Backend is running!');
+// Health check endpoint
+app.get('/health', (_req: Request, res: Response) => { // FIX: Renamed unused 'req' to '_req'
+  res.status(200).json({ status: 'ok' });
 });
 
-// Start the server
 app.listen(PORT, () => {
-  console.log(`AI Orchestrator Backend listening on port ${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
