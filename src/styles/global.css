@@ -1,6 +1,6 @@
 /* src/styles/global.css */
 
-root {
+:root {
   --bg-dark: #0d0d0d;
   --neon-green: #39ff14;
   --text-light: #e0e0e0;
