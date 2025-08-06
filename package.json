@@ -4,12 +4,13 @@
   "private": true,
   "description": "Root for the Master-Prompt-Editor monorepo",
   "scripts": {
-    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client && npm install --prefix cli",
+    "build:all": "tsc --build --verbose && npm run build --prefix cli",
     "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
     "lint:all": "eslint . --ext .ts,.tsx",
-    "build:all": "tsc --build --verbose"
+    "mpe": "node cli/dist/index.js"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.13.1",
@@ -25,5 +26,8 @@
   },
   "dependencies": {
     "@types/uuid": "^10.0.0"
+  },
+  "bin": {
+    "mpe": "cli/dist/index.js"
   }
 }

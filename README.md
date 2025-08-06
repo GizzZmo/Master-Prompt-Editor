@@ -4,100 +4,237 @@
 
 This project outlines the conceptualization and architectural blueprint for a groundbreaking AI-driven platform: a Master Prompt Editor integrated with an Advanced AI Toolkit, envisioned as the ultimate "Swiss Army Knife" for computers. This unified system aims to transcend the limitations of disparate AI tools, offering a cohesive, intelligent layer that permeates diverse computing tasks. The core value proposition lies in significantly enhancing productivity, fostering innovation, and democratizing access to sophisticated AI capabilities through an intuitive and adaptable design.
 
-By providing robust prompt management, advanced AI orchestration, and a user-centric interface, this platform is strategically positioned to become an indispensable intelligent co-pilot for both technical and non-technical users in the evolving landscape of artificial intelligence. Its strategic importance stems from its ability to abstract AI complexity, streamline workflows, and enable a more personalized and effective human-AI collaboration across various domains.
+By providing robust prompt management, advanced AI orchestration, collaborative workflows, responsible AI features, and multimodal support, this platform is strategically positioned to become an indispensable intelligent co-pilot for both technical and non-technical users in the evolving landscape of artificial intelligence.
 
-## 1. Introduction: Envisioning the AI "Swiss Army Knife"
+## 🌟 New Features (v2.0)
 
-The rapid evolution of artificial intelligence has ushered in an era where AI models are no longer confined to specialized applications but are becoming integral to everyday computing. This platform is designed to function as a true "Swiss Army Knife" for computers, offering a broad spectrum of AI-powered functionalities within a single, cohesive environment.
+### 🤝 Collaborative Features
+- **Voting System**: Community-driven prompt rating and feedback
+- **Commenting & Annotations**: Rich commenting system with in-line annotations
+- **Shared Prompt Libraries**: Create and manage collaborative prompt collections
+- **Review Workflows**: Structured approval processes for prompt modifications
 
-This README provides a high-level overview of the project's structure and conceptual implementation based on the detailed design document.
+### 📊 Evaluation & Versioning (Mirascope-inspired)
+- **Advanced Evaluation Metrics**: Performance, cost, bias, and quality scoring
+- **A/B Testing Framework**: Compare prompt versions with statistical confidence
+- **Cost Analytics**: Comprehensive tracking of AI API costs and usage
+- **Version Comparison**: Side-by-side analysis of prompt evolution
 
-## Project Structure
+### 🛡️ Responsible AI
+- **Bias Detection**: Automated identification of potential biases in prompts
+- **Ethical Templates**: Pre-built templates following ethical AI guidelines
+- **Compliance Validation**: Check prompts against ethical standards
+- **Inclusive Language Suggestions**: Real-time recommendations for better language
 
-This project is structured as a monorepo containing both a frontend (React/TypeScript) and a backend (Node.js/Express/TypeScript).
+### 🎭 Multimodal Support
+- **Cross-Modal Processing**: Handle text, image, audio, and video inputs
+- **Template Generation**: Automatic creation of multimodal prompt templates
+- **Format Validation**: Ensure media inputs meet processing requirements
+- **Fusion Capabilities**: Intelligent combination of different modality inputs
+
+## 🏗️ Architecture Overview
+
+This project is structured as a monorepo containing both a frontend (React/TypeScript) and a backend (Node.js/Express/TypeScript), with a command-line interface for power users.
 
 ```
 . # Root Directory
-├── public/             # Public assets (e.g., index.html)
-├── src/                # Frontend Source Code (React/TypeScript)
-│   ├── assets/         # Static assets like images
-│   ├── components/     # Reusable UI components
-│   │   ├── layout/     # Layout-specific components (Header, Sidebar)
-│   │   └── ui/         # Generic UI components (Button, Input)
-│   ├── context/        # React Context for global state
-│   ├── hooks/          # Custom React hooks
-│   ├── pages/          # Top-level application pages
-│   │   ├── AIToolkit/  # Advanced AI Toolkit module
-│   │   └── PromptEditor/ # Master Prompt Editor module
-│   ├── styles/         # Global styles
-│   ├── types/          # TypeScript type definitions (shared)
-│   ├── utils/          # Utility functions (e.g., API calls)
-│   ├── App.tsx         # Main application component
-│   └── index.tsx       # Entry point for React app
-├── server/             # Backend Source Code
-│   ├── src/            # Server-side source
-│   │   ├── config/     # Configuration files
-│   │   ├── data/       # Mock data stores
-│   │   ├── routes/     # API route definitions
-│   │   └── services/   # Business logic services
-│   │   └── index.ts    # Server entry point
-│   └── package.json    # Backend dependencies
-├── package.json        # Root dependencies (e.g., for monorepo tools, concurrently)
-├── tsconfig.json       # TypeScript configuration
-└── README.md           # This file
+├── cli/                 # Command-line interface
+│   ├── index.ts         # CLI entry point with all commands
+│   ├── package.json     # CLI dependencies
+│   └── tsconfig.json    # CLI TypeScript config
+├── public/              # Public assets (e.g., index.html)
+├── src/                 # Frontend Source Code (React/TypeScript)
+│   ├── components/      # Reusable UI components
+│   │   ├── layout/      # Layout-specific components (Header, Sidebar)
+│   │   └── ui/          # Generic UI components (Button, Input, etc.)
+│   │       ├── VotingComponent.tsx          # Collaborative voting UI
+│   │       ├── CommentsSection.tsx         # Comments and annotations
+│   │       ├── ResponsibleAIDashboard.tsx  # Bias detection interface
+│   │       └── MultimodalInputStub.tsx     # Multimodal input handling
+│   ├── context/         # React Context for global state
+│   ├── hooks/           # Custom React hooks
+│   ├── pages/           # Top-level application pages
+│   ├── styles/          # Global styles
+│   ├── types/           # TypeScript type definitions (shared)
+│   │   ├── ai.ts        # AI-related type definitions
+│   │   └── prompt.ts    # Extended prompt types with new features
+│   ├── utils/           # Utility functions (e.g., API calls)
+│   ├── App.tsx          # Main application component
+│   └── index.tsx        # Entry point for React app
+├── server/              # Backend Source Code
+│   ├── src/             # Server-side source
+│   │   ├── config/      # Configuration files
+│   │   ├── data/        # Mock data stores
+│   │   ├── routes/      # API route definitions
+│   │   │   ├── promptRoutes.ts           # Enhanced prompt management
+│   │   │   ├── collaborationRoutes.ts    # Voting, comments, libraries
+│   │   │   ├── evaluationRoutes.ts       # Mirascope-inspired evaluation
+│   │   │   ├── responsibleAIRoutes.ts    # Bias detection, ethics
+│   │   │   └── multimodalRoutes.ts       # Multimodal processing
+│   │   ├── services/    # Business logic services
+│   │   │   ├── CollaborationService.ts   # Collaborative features
+│   │   │   ├── MirascopeService.ts       # Evaluation & versioning
+│   │   │   ├── ResponsibleAIService.ts   # Bias detection & ethics
+│   │   │   └── MultimodalService.ts      # Multimodal processing
+│   │   └── index.ts     # Server entry point with all routes
+│   └── package.json     # Backend dependencies
+├── package.json         # Root dependencies (monorepo tools)
+├── tsconfig.json        # TypeScript configuration
+└── README.md            # This file
 ```
 
-## Frontend Features (Conceptual)
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ and npm
+- TypeScript knowledge for customization
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone [repository-url]
+   cd [project-folder]
+   ```
+
+2. **Install all dependencies:**
+   ```bash
+   npm run install:all
+   ```
+
+3. **Build the project:**
+   ```bash
+   npm run build:all
+   ```
+
+4. **Start the development servers:**
+   ```bash
+   npm run dev
+   ```
+   This starts both frontend and backend servers concurrently.
+
+   Alternatively, start them separately:
+   - Backend: `npm run dev:server`
+   - Frontend: `npm run dev:client`
+
+### 🖥️ CLI Usage
+
+The Master Prompt Editor comes with a powerful CLI tool for automation and scripting:
+
+```bash
+# Navigate to CLI directory and build
+cd cli && npm run build
+
+# Health check
+node dist/index.js health
+
+# Create a new prompt
+node dist/index.js prompt create -n "My Prompt" -d "Description" -c "Prompt content"
+
+# List all prompts
+node dist/index.js prompt list
+
+# Analyze prompt for bias and ethics
+node dist/index.js prompt analyze <promptId>
+
+# Run evaluation
+node dist/index.js eval run <promptId> -t performance
+
+# Vote on a prompt
+node dist/index.js collab vote <promptId> -t up
+
+# Generate multimodal template
+node dist/index.js multimodal template -m text,image,audio
+
+# Show multimodal capabilities
+node dist/index.js multimodal capabilities
+```
+
+## 🔗 API Endpoints
+
+### Core Prompt Management
+- `GET /api/prompts` - List all prompts
+- `POST /api/prompts` - Create new prompt (with automatic bias detection)
+- `GET /api/prompts/:id` - Get prompt details
+- `GET /api/prompts/:id/enhanced` - Get prompt with collaboration and AI analysis
+
+### 🤝 Collaboration API
+- `POST /api/collaboration/prompts/:id/vote` - Vote on prompt
+- `GET /api/collaboration/prompts/:id/votes` - Get voting summary
+- `POST /api/collaboration/prompts/:id/comments` - Add comment
+- `GET /api/collaboration/prompts/:id/comments` - Get comments
+- `POST /api/collaboration/libraries` - Create shared library
+
+### 📊 Evaluation API (Mirascope-inspired)
+- `POST /api/evaluation/prompts/:id/evaluate` - Run evaluation
+- `GET /api/evaluation/prompts/:id/evaluations` - Get evaluation history
+- `POST /api/evaluation/prompts/:id/compare-versions` - Compare versions
+- `POST /api/evaluation/prompts/:id/ab-test` - Run A/B test
+- `GET /api/evaluation/prompts/:id/cost-analytics` - Get cost data
+
+### 🛡️ Responsible AI API
+- `POST /api/responsible-ai/detect-bias` - Detect bias in content
+- `POST /api/responsible-ai/validate-ethics` - Validate ethical compliance
+- `GET /api/responsible-ai/ethical-templates` - Get ethical templates
+- `POST /api/responsible-ai/analyze-prompt` - Comprehensive analysis
+
+### 🎭 Multimodal API
+- `POST /api/multimodal/media/upload` - Upload media files
+- `POST /api/multimodal/process` - Process multimodal content
+- `POST /api/multimodal/templates/generate` - Generate templates
+- `GET /api/multimodal/capabilities` - Get processing capabilities
+
+## 🌟 Key Features
 
 ### Master Prompt Editor
-*   **Prompt Management & Versioning**: Centralized repository, semantic versioning, automated LLM call logging, rollback capabilities, metadata, API decoupling, intuitive playgrounds.
-*   **Advanced Prompt Engineering Techniques**: Support for Zero-shot, Few-shot, Chain-of-Thought (CoT), Meta-prompting, Persona-based, Generate Knowledge, and Self-consistency prompting.
-*   **Automated Prompt Optimization & Evaluation**: A/B testing, comprehensive evaluation metrics, Meta-learning, Gradient-based Optimization, DSPy integration, LLMOps integration for observability, benchmarking, and dataset management.
-*   **Collaborative Workflows**: Role-based access, approval workflows, formal review processes, team collaboration tools, CI/CD integration.
+- **Enhanced Prompt Management**: Centralized repository with semantic versioning and collaborative features
+- **Advanced Engineering Techniques**: Support for Zero-shot, Few-shot, Chain-of-Thought (CoT), and more
+- **Automated Optimization**: A/B testing, evaluation metrics, and bias detection
+- **Collaborative Workflows**: Voting, commenting, shared libraries, and review processes
 
 ### Advanced AI Toolkit
-*   **Multimodal AI Integration**: Unified system for text, images, audio, video processing via Feature-Level, Decision-Level, and Joint Embedding Spaces fusion. Integration of specialized neural networks (YOLO, CLIP, Llama).
-*   **AI Task Chaining & Workflow Automation**: Prompt chaining, visualized graph orchestration, no-code/low-code capabilities for automating content creation, data analysis, architectural design, and software development tasks.
-*   **Unified AI Framework & Architecture**: Framework-agnostic core, layered modular components (Utility, Intelligent Analysis/Logic, Coordination layers), robust input/output processing, flexible LLM integration, integrated feedback loops.
+- **Multimodal Integration**: Unified processing for text, images, audio, and video
+- **Responsible AI**: Built-in bias detection and ethical compliance checking
+- **Task Chaining**: Workflow automation with visual orchestration
+- **Cost Analytics**: Comprehensive tracking and optimization of AI API costs
 
-### User Experience (UX) and User Interface (UI) Design
-*   **Principles**: User-centricity, consistency, hierarchy, context, user control & freedom, accessibility, usability, abstracting complexity.
-*   **Explainable AI (XAI) Integration**: Transparency through explanations of AI outputs, metadata labeling for AI-generated/edited content.
-*   **Adaptive & Flexible Design**: Progressive disclosure, customizable layouts, catering to diverse skill levels, nonlinear workflows, dynamic input and feedback modes.
+### User Experience
+- **Intuitive Interface**: Clean, accessible design with progressive disclosure
+- **Explainable AI**: Transparency through detailed analysis and metadata
+- **Adaptive Design**: Customizable layouts for different skill levels
+- **Command-Line Interface**: Powerful CLI for automation and scripting
 
-## Backend Features (Conceptual)
+## 🛡️ Responsible AI Integration
 
-*   **API Endpoints**: RESTful APIs for prompt management (CRUD, versioning, rollback), AI task execution, workflow orchestration, and monitoring.
-*   **Services**: Business logic for interacting with (mock) LLM providers, managing prompt storage, orchestrating chained AI tasks, and handling evaluation metrics.
-*   **Data Storage**: Conceptualized storage for prompts, versions, and performance logs (mocked as JSON files).
+The platform prioritizes ethical AI development through:
 
-## Getting Started (Conceptual)
+- **Automated Bias Detection**: Real-time analysis of prompt content for potential biases
+- **Ethical Templates**: Pre-built templates following responsible AI guidelines
+- **Transparency Features**: Clear metadata and explanations for all AI outputs
+- **Inclusive Language**: Suggestions for more inclusive and respectful language
+- **Compliance Validation**: Automated checking against ethical standards
 
-To run this project, you would typically follow these steps:
+## 🔮 Future Enhancements
 
-1.  **Clone the repository:**
-    `git clone [repository-url]`
-    `cd [project-folder]`
+- **Real-time Collaboration**: Live editing and commenting like Google Docs
+- **Advanced Analytics**: Deeper insights into prompt performance and usage
+- **Plugin Architecture**: Extensible system for custom integrations
+- **Enterprise Features**: Advanced security, audit trails, and compliance tools
+- **Mobile App**: Native mobile applications for on-the-go prompt management
 
-2.  **Install dependencies (root, frontend, and backend):**
-    `npm run install:all`
+## 🤝 Contributing
 
-3.  **Start the development servers (frontend and backend concurrently):**
-    `npm run dev`
-    *   (Alternatively, for separate starts:)
-    *   Start the backend server: `npm run dev:server`
-    *   Start the frontend application: `npm run dev:client`
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on:
+- Setting up the development environment
+- Code style and standards
+- Testing requirements
+- Pull request process
+- Community guidelines
 
-(Note: These commands are conceptual and depend on the actual `package.json` scripts implemented.)
+## 📄 License
 
-## Responsible AI Considerations
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-The project acknowledges inherent AI limitations (bias, insufficient context, unpredictability, misrepresentation) and prioritizes ethical considerations through:
-*   Transparency & Disclosure (metadata labeling for AI content).
-*   Embedding Responsible AI Development Principles (algorithmic audits, explainability, data governance, cybersecurity).
-*   Mitigating Ethical Risks (careful prompt crafting, continuous monitoring).
-*   Strict Privacy Protocols.
+---
 
-## Future Outlook
-
-The long-term vision includes democratizing specialized domains (e.g., architectural design), enhancing the software development lifecycle, enabling hyper-personalized experiences, and providing advanced predictive analytics. The modular and extensible architecture ensures adaptability and extensibility for future AI advancements.
+**Built with ❤️ for the AI community** - Empowering responsible and collaborative AI development.
