@@ -1,5 +1,3 @@
-# .github/workflows/ci.yml
-
 name: Master-Prompt-Editor CI
 
 on:
@@ -21,7 +19,6 @@ jobs:
         with:
           node-version: '20.x'
           cache: 'npm'
-          # FIX: Explicitly list each package.json file for robust caching
           cache-dependency-path: |
             package.json
             client/package.json
@@ -29,6 +26,9 @@ jobs:
 
       - name: Install all dependencies
         run: npm install && npm install --prefix server && npm install --prefix client
+
+      - name: TypeScript Incremental Build
+        run: tsc --build
 
       - name: Lint project
         run: npm run lint:all
