@@ -1,10 +1,10 @@
 /* src/styles/global.css */
 
-:root {
-  --primary-color: #007bff;
-  --secondary-color: #6c757d;
-  --background-color: #f8f9fa;
-  --text-color: #343a40;
+root {
+  --bg-dark: #0d0d0d;
+  --neon-green: #39ff14;
+  --text-light: #e0e0e0;
+  --panel-glow: rgba(57, 255, 20, 0.3);;
   --sidebar-width: 250px;
 }
 
