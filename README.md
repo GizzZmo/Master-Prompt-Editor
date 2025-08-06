@@ -1,5 +1,7 @@
 # The AI Orchestrator: A Master Prompt Editor and Advanced AI Toolkit
 
+[![Master-Prompt-Editor CI](https://github.com/GizzZmo/Master-Prompt-Editor/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/GizzZmo/Master-Prompt-Editor/actions/workflows/ci.yml)
+
 ## Executive Summary
 
 This project outlines the conceptualization and architectural blueprint for a groundbreaking AI-driven platform: a Master Prompt Editor integrated with an Advanced AI Toolkit, envisioned as the ultimate "Swiss Army Knife" for computers. This unified system aims to transcend the limitations of disparate AI tools, offering a cohesive, intelligent layer that permeates diverse computing tasks. The core value proposition lies in significantly enhancing productivity, fostering innovation, and democratizing access to sophisticated AI capabilities through an intuitive and adaptable design.
