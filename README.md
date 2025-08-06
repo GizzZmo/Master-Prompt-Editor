@@ -1,3 +1,4 @@
+![Neon Sage Logo](src/assets/neon-sage/neon-sage-logo.png)
 # The AI Orchestrator: A Master Prompt Editor and Advanced AI Toolkit
 
 [![Master-Prompt-Editor CI](https://github.com/GizzZmo/Master-Prompt-Editor/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/GizzZmo/Master-Prompt-Editor/actions/workflows/ci.yml)
