@@ -3,6 +3,32 @@ export interface Prompt {
     name: string;
     content: string;
     version: string;
+    isShared?: boolean;
+    sharedLibraryId?: string;
+    votes?: Array<{
+        id: string;
+        promptId: string;
+        userId: string;
+        voteType: 'up' | 'down';
+        createdAt: string;
+    }>;
+    comments?: Array<{
+        id: string;
+        promptId: string;
+        userId: string;
+        content: string;
+        createdAt: string;
+    }>;
+    ethicalTags?: string[];
+    biasDetectionResult?: {
+        overallScore: number;
+        categories: Array<{
+            type: string;
+            score: number;
+        }>;
+        suggestions: string[];
+    };
+    modalityType?: 'text' | 'text-image' | 'text-audio' | 'multimodal';
 }
 export interface PromptVersion {
     id: string;

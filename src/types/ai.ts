@@ -5,6 +5,35 @@ export interface Prompt {
   name: string;
   content: string;
   version: string;
+  // Collaborative features
+  isShared?: boolean;
+  sharedLibraryId?: string;
+  votes?: Array<{
+    id: string;
+    promptId: string;
+    userId: string;
+    voteType: 'up' | 'down';
+    createdAt: string;
+  }>;
+  comments?: Array<{
+    id: string;
+    promptId: string;
+    userId: string;
+    content: string;
+    createdAt: string;
+  }>;
+  // Responsible AI features
+  ethicalTags?: string[];
+  biasDetectionResult?: {
+    overallScore: number;
+    categories: Array<{
+      type: string;
+      score: number;
+    }>;
+    suggestions: string[];
+  };
+  // Multimodal support
+  modalityType?: 'text' | 'text-image' | 'text-audio' | 'multimodal';
 }
 
 export interface PromptVersion {

@@ -27,7 +27,12 @@ export const mockPrompts: Prompt[] = [
     tags: ['creative', 'writing', 'assistant'],
     content: 'Initial version of the creative writing prompt.',
     version: '1.0',
-    versions: mockPromptVersions.filter(v => v.promptId === 'p1')
+    versions: mockPromptVersions.filter(v => v.promptId === 'p1'),
+    modalityType: 'text',
+    isShared: false,
+    votes: [],
+    comments: [],
+    ethicalTags: ['approved'],
   },
   {
     id: 'p2',
@@ -36,6 +41,11 @@ export const mockPrompts: Prompt[] = [
     tags: ['technical', 'explainer', 'code'],
     content: 'Initial version of the technical explainer.',
     version: '1.0',
-    versions: mockPromptVersions.filter(v => v.promptId === 'p2')
+    versions: mockPromptVersions.filter(v => v.promptId === 'p2'),
+    modalityType: 'text',
+    isShared: false,
+    votes: [],
+    comments: [],
+    ethicalTags: ['approved'],
   }
 ];

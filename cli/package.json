@@ -1,0 +1,24 @@
+{
+  "name": "mpe-cli",
+  "version": "1.0.0",
+  "description": "Master Prompt Editor CLI",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mpe": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node-esm index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "axios": "^1.6.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "typescript": "^5.4.5",
+    "ts-node": "^10.9.2"
+  }
+}
