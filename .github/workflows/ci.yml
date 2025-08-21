@@ -30,11 +30,8 @@ jobs:
       - name: Build shared types first
         run: tsc --build src/types
         
-      - name: TypeScript Incremental Build
-        run: tsc --build
+      - name: Build all projects
+        run: npm run build:all
 
       - name: Lint project
         run: npm run lint:all
-
-      - name: Build all projects
-        run: npm run build:all
