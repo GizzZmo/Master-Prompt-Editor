@@ -47,3 +47,19 @@ export type PromptEvaluationFunction = (prompt: Prompt, output: unknown) => Prom
 
 // A function to optimize a prompt based on previous results.
 export type PromptOptimizationFunction = (prompt: Prompt, results: PromptEvaluationResult[]) => Prompt;
+
+// Chat message types for conversation history
+export interface ChatMessage {
+  id: string;
+  type: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: string;
+}
+
+export interface ChatSession {
+  id: string;
+  messages: ChatMessage[];
+  promptId?: string;
+  createdAt: string;
+  updatedAt: string;
+}

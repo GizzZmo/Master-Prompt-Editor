@@ -37,3 +37,31 @@ export const api = {
   
   // Add other API methods here as needed
 };
+
+// AI content generation API
+interface AIConfig {
+  model?: string;
+  temperature?: number;
+}
+
+interface AIResponse {
+  success: boolean;
+  data?: { text: string };
+  error?: string;
+}
+
+export const generateAIContent = async (prompt: string, config: AIConfig): Promise<AIResponse> => {
+  try {
+    const response = await request<{ text: string }>('/ai/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, config }),
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error occurred' 
+    };
+  }
+};
