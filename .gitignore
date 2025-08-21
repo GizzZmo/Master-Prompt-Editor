@@ -8,6 +8,17 @@ dist/
 build/
 **/build/
 
+# TypeScript build artifacts
+*.tsbuildinfo
+*.d.ts
+*.d.ts.map
+*.js
+*.js.map
+!client/src/**/*.js
+!client/src/**/*.d.ts
+!server/src/**/*.js
+!server/src/**/*.d.ts
+
 # Log files
 *.log
 npm-debug.log*
