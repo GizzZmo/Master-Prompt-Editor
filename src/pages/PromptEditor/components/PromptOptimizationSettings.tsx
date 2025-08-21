@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import Button from '../../../components/ui/Button';
 import { optimizePrompt, evaluatePrompt } from '../../../utils/api';
-import { PromptEvaluationResult, PromptOptimizationStrategy } from '../../../types/prompt';
+import { PromptEvaluationResult, PromptOptimizationStrategyType } from '../../../types/prompt';
 
 interface PromptOptimizationSettingsProps {
   promptId: string;
 }
 
 const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({ promptId }) => {
-  const [optimizationStrategy, setOptimizationStrategy] = useState<PromptOptimizationStrategy>('meta-prompting');
+  const [optimizationStrategy, setOptimizationStrategy] = useState<PromptOptimizationStrategyType>('meta-prompting');
   const [evaluationMetric, setEvaluationMetric] = useState<string>('accuracy');
   const [evaluationScore, setEvaluationScore] = useState<number>(0);
   const [feedback, setFeedback] = useState<string>('');
@@ -56,7 +56,7 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       <h4>Automated Optimization</h4>
       <div style={{ marginBottom: '15px' }}>
         <label htmlFor="optimization-strategy">Optimization Strategy:</label>
-        <select id="optimization-strategy" value={optimizationStrategy} onChange={(e) => setOptimizationStrategy(e.target.value as PromptOptimizationStrategy)} style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '100%' }}>
+        <select id="optimization-strategy" value={optimizationStrategy} onChange={(e) => setOptimizationStrategy(e.target.value as PromptOptimizationStrategyType)} style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '100%' }}>
           <option value="meta-prompting">Meta-prompting (AI refines prompt)</option>
           <option value="gradient-based">Gradient-based Optimization</option>
           <option value="dspy">DSPy Integration (Automated techniques)</option>

@@ -3,17 +3,32 @@
   "version": "1.0.0",
   "private": true,
   "description": "Root for the Master-Prompt-Editor monorepo",
+  "type": "module",
   "scripts": {
     "install:all": "npm install && npm install --prefix server && npm install --prefix client",
-    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\" \"npm:dev:frontend\"",
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
+    "dev:frontend": "vite",
+    "build:frontend": "tsc && vite build",
+    "build:server": "npm run build --prefix server",
+    "build:client": "npm run build --prefix client",
+    "build:all": "npm run build:frontend && npm run build:server && npm run build:client",
     "lint:all": "eslint . --ext .ts,.tsx",
-    "build:all": "tsc --build --verbose"
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@types/node": "^24.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.8.1"
   },
   "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
+    "@vitejs/plugin-react": "^4.3.1",
     "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
@@ -21,6 +36,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
     "prettier": "^3.3.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vite": "^5.2.13"
   }
 }

@@ -1,43 +1,64 @@
 // /src/types/ai.ts
 
+// Re-export prompt types to avoid conflicts
+export { 
+  Prompt, 
+  PromptVersion, 
+  PromptCategory, 
+  PromptEvaluationResult, 
+  PromptOptimizationStrategy,
+  PromptOptimizationStrategyType 
+} from './prompt';
+
 /**
- * Core prompt data structure representing a reusable AI prompt template
+ * Supported AI model types for the toolkit
  */
-export interface Prompt {
-  /** Unique identifier for the prompt */
-  id: string;
-  /** Human-readable prompt name */
-  name: string;
-  /** The actual prompt content/template text */
-  content: string;
-  /** Version identifier for the current prompt iteration */
-  version: string;
+export type AIModelType = 'GPT-4' | 'GPT-3.5' | 'DALL-E 3' | 'Whisper' | 'Llama 3' | 'Claude' | 'Gemini';
+
+/**
+ * Configuration for AI model settings
+ */
+export interface AIConfig {
+  model: AIModelType;
+  temperature?: number;
+  maxTokens?: number;
+  apiKey?: string;
 }
 
 /**
- * Represents a specific version of a prompt for version control
+ * Individual step in an AI workflow
  */
-export interface PromptVersion {
-  /** Unique identifier for this version */
+export interface AIWorkflowStep {
   id: string;
-  /** ID of the parent prompt */
-  promptId: string;
-  /** Version identifier (e.g., "1.0", "2.1") */
-  version: string;
-  /** Prompt content for this specific version */
-  content: string;
-  /** Timestamp when this version was created */
+  name: string;
+  type: 'prompt' | 'model' | 'processing';
+  config: Record<string, unknown>;
+  order: number;
+}
+
+/**
+ * Complete AI workflow definition
+ */
+export interface AIWorkflow {
+  id: string;
+  name: string;
+  description: string;
+  steps: AIWorkflowStep[];
   createdAt: string;
+  updatedAt: string;
 }
 
 /**
- * Category for organizing prompts by domain or use case
+ * Log entry for AI task execution
  */
-export interface PromptCategory {
-  /** Unique identifier for the category */
+export interface AITaskExecutionLog {
   id: string;
-  /** Category display name */
-  name: string;
+  workflowId: string;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  startTime: string;
+  endTime?: string;
+  result?: unknown;
+  error?: string;
 }
 
 /**
@@ -55,46 +76,9 @@ export interface LLMCallLog {
 }
 
 /**
- * Result of evaluating a prompt's effectiveness
- */
-export interface PromptEvaluationResult {
-  /** Numerical score (typically 0-1 or 0-100) */
-  score: number;
-  /** Explanation of the scoring rationale */
-  reasoning: string;
-  /** Optional suggestions for improvement */
-  suggestions?: string[];
-}
-
-/**
- * Strategy for automatically optimizing prompts
- */
-export interface PromptOptimizationStrategy {
-  /** Unique identifier for the strategy */
-  id: string;
-  /** Human-readable strategy name */
-  name: string;
-  /** Function that applies the optimization to a prompt */
-  apply: (prompt: Prompt) => Prompt;
-}
-
-/**
  * Function type for creating prompt templates with variable substitution
  */
 export type PromptTemplate = (variables: Record<string, string | number>) => string;
-
-/**
- * Function type for evaluating prompt effectiveness based on output quality
- */
-export type PromptEvaluationFunction = (prompt: Prompt, output: unknown) => PromptEvaluationResult;
-
-/**
- * Function type for optimizing prompts based on evaluation results
- */
-export type PromptOptimizationFunction = (prompt: Prompt, results: PromptEvaluationResult[]) => Prompt;
-
-// ===== CHAT HISTORY TYPES =====
-// These types support the conversational AI features in the prompt playground
 
 /**
  * Individual message in a chat conversation.
