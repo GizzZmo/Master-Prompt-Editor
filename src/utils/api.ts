@@ -1,6 +1,6 @@
 // /src/utils/api.ts
 
-import { Prompt } from '../types/ai';
+import { Prompt, AIModelType, AITaskExecutionLog, AIWorkflow, PromptEvaluationResult, PromptOptimizationStrategyType } from '../types/ai';
 
 // API base URL configuration - uses environment variable or falls back to relative path
 const BASE_URL = process.env.REACT_APP_API_URL || '/api';
@@ -117,4 +117,54 @@ export const generateAIContent = async (prompt: string, config: AIConfig): Promi
       error: error instanceof Error ? error.message : 'Unknown error occurred' 
     };
   }
+};
+
+// Additional API functions for missing imports
+
+export const getAIModels = async (): Promise<AIModelType[]> => {
+  try {
+    return await request<AIModelType[]>('/ai/models');
+  } catch (error) {
+    console.warn('Failed to fetch AI models, using defaults');
+    return ['GPT-4', 'GPT-3.5', 'Claude'];
+  }
+};
+
+export const getExecutionLogs = async (): Promise<AITaskExecutionLog[]> => {
+  try {
+    return await request<AITaskExecutionLog[]>('/ai/logs');
+  } catch (error) {
+    console.warn('Failed to fetch execution logs');
+    return [];
+  }
+};
+
+export const createWorkflow = async (workflow: Omit<AIWorkflow, 'id' | 'createdAt' | 'updatedAt'>): Promise<AIWorkflow> => {
+  return request<AIWorkflow>('/ai/workflows', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(workflow),
+  });
+};
+
+export const executeWorkflow = async (workflowId: string): Promise<AITaskExecutionLog> => {
+  return request<AITaskExecutionLog>(`/ai/workflows/${workflowId}/execute`, {
+    method: 'POST',
+  });
+};
+
+export const optimizePrompt = async (promptId: string, strategy: PromptOptimizationStrategyType): Promise<Prompt> => {
+  return request<Prompt>(`/prompts/${promptId}/optimize`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ strategy }),
+  });
+};
+
+export const evaluatePrompt = async (promptId: string, metric: string): Promise<PromptEvaluationResult> => {
+  return request<PromptEvaluationResult>(`/prompts/${promptId}/evaluate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ metric }),
+  });
 };

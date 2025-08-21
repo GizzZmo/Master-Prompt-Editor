@@ -31,10 +31,17 @@ export interface LLMCallLog {
 }
 
 export interface PromptEvaluationResult {
+    promptId?: string;
+    version?: string;
+    metric?: string;
     score: number;
     reasoning: string;
+    feedback?: string;
+    timestamp?: string;
     suggestions?: string[];
 }
+
+export type PromptOptimizationStrategyType = 'meta-prompting' | 'chain-of-thought' | 'few-shot' | 'zero-shot';
 
 export interface PromptOptimizationStrategy {
     id: string;

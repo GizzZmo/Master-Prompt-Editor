@@ -2,6 +2,8 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": ".",
     "composite": true,
     "declaration": true,
     "declarationMap": true,
@@ -11,5 +13,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["./**/*"]
+  "include": ["./**/*"],
+  "exclude": ["dist", "node_modules"]
 }

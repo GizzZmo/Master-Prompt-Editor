@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { usePromptManagement } from '../../hooks/usePromptManagement';
 import { PromptInputArea } from './components/PromptInputArea';
@@ -26,7 +26,7 @@ export function PromptEditorPage() {
    * Synchronize local content state with the active prompt when it changes.
    * This ensures the editor displays the latest saved content.
    */
-  React.useEffect(() => {
+  useEffect(() => {
     if (activePrompt) {
       setCurrentContent(activePrompt.content);
     }
