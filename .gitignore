@@ -34,3 +34,10 @@ pnpm-debug.log*
 
 # Test reports
 coverage/
+
+# TypeScript build artifacts
+*.tsbuildinfo
+*.d.ts.map
+*.js.map
+src/types/*.js
+src/types/*.d.ts
