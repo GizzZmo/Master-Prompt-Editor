@@ -65,8 +65,10 @@ export function PromptEditorPage() {
   }
 
   return (
-    {/* Two-column grid layout for integrated prompt editing and testing */}
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', height: '100%' }}>
+
+    <div>
+      {/* Two-column grid layout for integrated prompt editing and testing */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', height: '100%' }}>
       {/* Left Column - Prompt Editor and Version Management */}
       <div>
         <h2>{activePrompt.name}</h2>
@@ -107,6 +109,7 @@ export function PromptEditorPage() {
           }))}
           onRollback={(version) => console.log('Rollback to version:', version)}
         />
+
       </div>
       
       {/* Right Column - Interactive Chat Playground */}
@@ -119,6 +122,7 @@ export function PromptEditorPage() {
         {/* Pass current content to playground for real-time testing */}
         <PromptPlayground promptContent={currentContent} />
       </div>
+    </div>
     </div>
   );
 }
