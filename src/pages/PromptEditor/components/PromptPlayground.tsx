@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { generateAIContent } from '../../../utils/api';
 import { ChatMessage } from '../../../types/ai';
 

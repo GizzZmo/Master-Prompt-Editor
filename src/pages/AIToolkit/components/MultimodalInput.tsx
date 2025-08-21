@@ -1,5 +1,5 @@
 // FIX: Removed unused 'useState' and 'Button' imports
-import React from 'react';
+
 
 // Define props interface for type safety
 interface MultimodalInputProps {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { generateAIContent } from '../../utils/api'; // Import the new specific API function
 import { AIConfig } from '../../types/ai'; // Import AIConfig
 

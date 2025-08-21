@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { AIModelType, AITaskExecutionLog, AIWorkflow } from '../types/ai';
 
 interface AIContextType {
@@ -31,7 +31,7 @@ export const AIProvider: React.FC<AIProviderProps> = ({ children }) => {
 
   // In a real application, you would fetch initial workflows, models, and logs here
   // For example, using useEffect and the API utility.
-  React.useEffect(() => {
+  useEffect(() => {
     // Mock data for initial state
     setAiModels(['GPT-4', 'DALL-E 3', 'Whisper', 'Llama 3'] as AIModelType[]);
   }, []);

@@ -1,5 +1,5 @@
 // FIX: Removed unused 'Button' import
-import React from 'react';
+
 
 interface PromptInputAreaProps {
   // FIX: Replaced 'any' with a specific function type

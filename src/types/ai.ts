@@ -1,7 +1,7 @@
 // /src/types/ai.ts
 
 // Re-export prompt types to avoid conflicts
-export { 
+export type { 
   Prompt, 
   PromptVersion, 
   PromptCategory, 
@@ -34,6 +34,10 @@ export interface AIWorkflowStep {
   type: 'prompt' | 'model' | 'processing';
   config: Record<string, unknown>;
   order: number;
+  // Additional properties for compatibility
+  taskType?: string;
+  inputMapping?: Record<string, unknown>;
+  outputMapping?: Record<string, unknown>;
 }
 
 /**
@@ -46,6 +50,8 @@ export interface AIWorkflow {
   steps: AIWorkflowStep[];
   createdAt: string;
   updatedAt: string;
+  // Additional properties for compatibility
+  createdBy?: string;
 }
 
 /**
@@ -59,6 +65,12 @@ export interface AITaskExecutionLog {
   endTime?: string;
   result?: unknown;
   error?: string;
+  // Additional properties for compatibility with components
+  taskId?: string;
+  timestamp?: string;
+  success?: boolean;
+  durationMs?: number;
+  cost?: number;
 }
 
 /**

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Button from '../../../components/ui/Button';
 import { optimizePrompt, evaluatePrompt } from '../../../utils/api';
 import { PromptEvaluationResult, PromptOptimizationStrategyType } from '../../../types/prompt';

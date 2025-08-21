@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getAIModels, getExecutionLogs } from '../../../utils/api';
 import { AIModelType, AITaskExecutionLog } from '../../../types/ai';
 

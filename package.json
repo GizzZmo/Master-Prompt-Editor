@@ -10,7 +10,7 @@
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
     "dev:frontend": "vite",
-    "build:frontend": "tsc && vite build",
+    "build:frontend": "tsc --project tsconfig.build.json && vite build",
     "build:server": "npm run build --prefix server",
     "build:client": "npm run build --prefix client",
     "build:all": "npm run build:frontend && npm run build:server && npm run build:client",

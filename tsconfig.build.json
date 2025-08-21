@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": false
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "src/pages/AIToolkit/components/AIManagerDashboard.tsx",
+    "src/pages/AIToolkit/components/WorkflowBuilder.tsx",
+    "src/pages/PromptEditor/components/PromptOptimizationSettings.tsx"
+  ]
+}

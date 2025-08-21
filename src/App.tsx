@@ -1,10 +1,9 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
 import DashboardPage from './pages/DashboardPage';
-import PromptEditorPage from './pages/PromptEditor/PromptEditorPage';
-import AIToolkitPage from './pages/AIToolkit/AIToolkitPage';
+import { PromptEditorPage } from './pages/PromptEditor/PromptEditorPage';
+import { AIToolkitPage } from './pages/AIToolkit/AIToolkitPage';
 import SettingsPage from './pages/SettingsPage';
 import { AIProvider } from './context/AIContext';
 
