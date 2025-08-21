@@ -27,6 +27,9 @@ jobs:
       - name: Install all dependencies
         run: npm install && npm install --prefix server && npm install --prefix client
 
+      - name: Build shared types first
+        run: tsc --build src/types
+        
       - name: TypeScript Incremental Build
         run: tsc --build
 
