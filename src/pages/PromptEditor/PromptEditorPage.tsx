@@ -65,6 +65,7 @@ export function PromptEditorPage() {
   }
 
   return (
+
     <div>
       {/* Two-column grid layout for integrated prompt editing and testing */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', height: '100%' }}>
@@ -108,6 +109,7 @@ export function PromptEditorPage() {
           }))}
           onRollback={(version) => console.log('Rollback to version:', version)}
         />
+
       </div>
       
       {/* Right Column - Interactive Chat Playground */}

@@ -29,9 +29,11 @@ jobs:
 
       - name: Build shared types first
         run: tsc --build src/types
+        
 
       - name: Build all projects  
         run: npm run build:all
+
 
       - name: Lint project
         run: npm run lint:all
