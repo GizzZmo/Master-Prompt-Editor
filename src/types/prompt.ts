@@ -39,9 +39,25 @@ export interface PromptEvaluationResult {
     feedback?: string;
     timestamp?: string;
     suggestions?: string[];
+    performanceMetrics?: PerformanceEvaluationMetrics;
 }
 
-export type PromptOptimizationStrategyType = 'meta-prompting' | 'chain-of-thought' | 'few-shot' | 'zero-shot';
+export interface PerformanceEvaluationMetrics {
+    responseTime: number; // milliseconds
+    tokenUsage: {
+        input: number;
+        output: number;
+        total: number;
+    };
+    cost: number; // USD
+    accuracy?: number; // percentage
+    latency: number; // milliseconds
+    throughput?: number; // requests per second
+    memoryUsage?: number; // bytes
+    errorRate?: number; // percentage
+}
+
+export type PromptOptimizationStrategyType = 'meta-prompting' | 'gradient-based' | 'dspy' | 'chain-of-thought' | 'few-shot' | 'zero-shot';
 
 export interface PromptOptimizationStrategy {
     id: string;
