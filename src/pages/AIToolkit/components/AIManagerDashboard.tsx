@@ -45,12 +45,14 @@ const AIManagerDashboard: React.FC = () => {
     fetchLogs();
     collectSystemMetrics();
 
-    // Set up periodic metrics collection
-    const metricsInterval = setInterval(collectSystemMetrics, 30000); // Every 30 seconds
-
-    return () => clearInterval(metricsInterval);
-  }, []);
-
+    // Set up periodic metrics collection, only if not paused
+    if (!metricsPaused) {
+      const intervalId = setInterval(collectSystemMetrics, metricsIntervalMs);
+      return () => clearInterval(intervalId);
+    }
+    // If paused, no interval
+    return undefined;
+  }, [metricsIntervalMs, metricsPaused]);
   const formatBytes = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
