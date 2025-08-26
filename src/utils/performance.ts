@@ -86,11 +86,18 @@ export class PerformanceTester {
    * Measure memory usage
    */
   measureMemory(id: string): PerformanceMetric {
-    const memoryInfo = (performance as any).memory;
+    interface MemoryInfo {
+      usedJSHeapSize: number;
+      totalJSHeapSize?: number;
+      jsHeapSizeLimit?: number;
+    }
+    const memoryInfo = typeof performance !== "undefined" && "memory" in performance
+      ? (performance.memory as MemoryInfo)
+      : undefined;
     const metric: PerformanceMetric = {
       id,
       name: 'Memory Usage',
-      value: memoryInfo ? memoryInfo.usedJSHeapSize : 0,
+      value: memoryInfo && typeof memoryInfo.usedJSHeapSize === "number" ? memoryInfo.usedJSHeapSize : 0,
       unit: 'bytes',
       timestamp: new Date().toISOString(),
       metadata: memoryInfo
