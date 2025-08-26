@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Button from '../../../components/ui/Button';
 import { optimizePrompt, evaluatePrompt } from '../../../utils/api';
 import { PromptEvaluationResult, PromptOptimizationStrategyType } from '../../../types/prompt';
-import { useToast } from '../../../context/ToastContext';
+import { useToast } from '../../../context/toastContextHelpers';
 import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 
 interface PromptOptimizationSettingsProps {

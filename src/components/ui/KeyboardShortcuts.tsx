@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 interface KeyboardShortcut {
   key: string;
@@ -13,28 +13,15 @@ interface KeyboardShortcutsProps {
 const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
   const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Show shortcuts help with Ctrl+? or Cmd+?
-      if ((event.ctrlKey || event.metaKey) && event.key === '/') {
-        event.preventDefault();
-        setIsVisible(prev => !prev);
-      }
+  const closeModal = useCallback(() => {
+    setIsVisible(false);
+  }, []);
 
-      // Execute shortcuts
-      shortcuts.forEach(shortcut => {
-        if (matchesShortcut(event, shortcut.key)) {
-          event.preventDefault();
-          shortcut.action?.();
-        }
-      });
-    };
+  const toggleModal = useCallback(() => {
+    setIsVisible(prev => !prev);
+  }, []);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [shortcuts]);
-
-  const matchesShortcut = (event: KeyboardEvent, shortcutKey: string): boolean => {
+  const matchesShortcut = useCallback((event: KeyboardEvent, shortcutKey: string): boolean => {
     const keys = shortcutKey.toLowerCase().split('+');
     const hasCtrl = keys.includes('ctrl') && (event.ctrlKey || event.metaKey);
     const hasShift = keys.includes('shift') && event.shiftKey;
@@ -47,19 +34,53 @@ const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
       (!keys.includes('alt') || hasAlt) &&
       event.key.toLowerCase() === key
     );
-  };
+  }, []);
 
-  const formatShortcut = (shortcut: string): string => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Handle escape key to close modal
+      if (event.key === 'Escape' && isVisible) {
+        event.preventDefault();
+        closeModal();
+        return;
+      }
+
+      // Show shortcuts help with Ctrl+/ or Cmd+/
+      if ((event.ctrlKey || event.metaKey) && event.key === '/') {
+        event.preventDefault();
+        toggleModal();
+        return;
+      }
+
+      // Execute shortcuts (only when modal is not visible to avoid conflicts)
+      if (!isVisible) {
+        shortcuts.forEach(shortcut => {
+          if (matchesShortcut(event, shortcut.key)) {
+            event.preventDefault();
+            shortcut.action?.();
+          }
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [shortcuts, isVisible, matchesShortcut, closeModal, toggleModal]);
+
+  // Memoize platform detection for better performance
+  const isMac = useMemo(() => navigator.platform.includes('Mac'), []);
+
+  const formatShortcut = useCallback((shortcut: string): string => {
     return shortcut
       .split('+')
       .map(key => {
         switch (key.toLowerCase()) {
           case 'ctrl':
-            return navigator.platform.includes('Mac') ? '⌘' : 'Ctrl';
+            return isMac ? '⌘' : 'Ctrl';
           case 'shift':
             return '⇧';
           case 'alt':
-            return navigator.platform.includes('Mac') ? '⌥' : 'Alt';
+            return isMac ? '⌥' : 'Alt';
           case 'enter':
             return '↵';
           default:
@@ -67,7 +88,7 @@ const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
         }
       })
       .join(' + ');
-  };
+  }, [isMac]);
 
   if (!isVisible) {
     return (
@@ -84,33 +105,20 @@ const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
           zIndex: 999,
           cursor: 'pointer',
         }}
-        onClick={() => setIsVisible(true)}
+        onClick={toggleModal}
+        onKeyDown={(e) => e.key === 'Enter' && toggleModal()}
         title="Show keyboard shortcuts"
+        role="button"
+        tabIndex={0}
       >
-        Press {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'} + / for shortcuts
+        Press {isMac ? '⌘' : 'Ctrl'} + / for shortcuts
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        backgroundColor: 'white',
-        border: '1px solid #e0e0e0',
-        borderRadius: '12px',
-        padding: '24px',
-        maxWidth: '500px',
-        width: '90%',
-        maxHeight: '80vh',
-        overflowY: 'auto',
-        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
-        zIndex: 1001,
-      }}
-    >
+    <>
+      {/* Backdrop */}
       <div
         style={{
           position: 'fixed',
@@ -121,13 +129,35 @@ const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           zIndex: 1000,
         }}
-        onClick={() => setIsVisible(false)}
+        onClick={closeModal}
+        aria-hidden="true"
       />
-      <div style={{ position: 'relative', zIndex: 1002 }}>
+      {/* Modal */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: 'white',
+          border: '1px solid #e0e0e0',
+          borderRadius: '12px',
+          padding: '24px',
+          maxWidth: '500px',
+          width: '90%',
+          maxHeight: '80vh',
+          overflowY: 'auto',
+          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
+          zIndex: 1001,
+        }}
+        role="dialog"
+        aria-labelledby="shortcuts-title"
+        aria-modal="true"
+      >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h3 style={{ margin: 0, color: '#333' }}>Keyboard Shortcuts</h3>
+          <h3 id="shortcuts-title" style={{ margin: 0, color: '#333' }}>Keyboard Shortcuts</h3>
           <button
-            onClick={() => setIsVisible(false)}
+            onClick={closeModal}
             style={{
               background: 'none',
               border: 'none',
@@ -137,6 +167,7 @@ const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
               padding: '0',
             }}
             aria-label="Close shortcuts help"
+            type="button"
           >
             ×
           </button>
@@ -144,7 +175,7 @@ const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
         <div style={{ display: 'grid', gap: '12px' }}>
           {shortcuts.map((shortcut, index) => (
             <div
-              key={index}
+              key={`${shortcut.key}-${index}`}
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -170,7 +201,7 @@ const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

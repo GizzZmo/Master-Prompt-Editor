@@ -4,7 +4,7 @@ import { usePromptManagement } from '../../hooks/usePromptManagement';
 import { PromptInputArea } from './components/PromptInputArea';
 import { PromptVersioningPanel } from './components/PromptVersioningPanel';
 import { PromptPlayground } from './components/PromptPlayground';
-import { useToast } from '../../context/ToastContext';
+import { useToast } from '../../context/toastContextHelpers';
 import SearchBar from '../../components/ui/SearchBar';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { exportSinglePrompt } from '../../utils/exportImport';
