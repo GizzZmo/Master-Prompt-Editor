@@ -61,7 +61,7 @@ const AIManagerDashboard: React.FC = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const calculateAverageMetrics = () => {
+  const avgMetrics = useMemo(() => {
     if (executionLogs.length === 0) return { avgDuration: 0, avgCost: 0, successRate: 0 };
     
     const totalDuration = executionLogs.reduce((sum, log) => sum + (log.durationMs || 0), 0);
@@ -73,9 +73,7 @@ const AIManagerDashboard: React.FC = () => {
       avgCost: totalCost / executionLogs.length,
       successRate: (successCount / executionLogs.length) * 100
     };
-  };
-
-  const avgMetrics = calculateAverageMetrics();
+  }, [executionLogs]);
 
   return (
     <div>
