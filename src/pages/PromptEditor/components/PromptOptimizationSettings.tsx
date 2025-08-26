@@ -4,6 +4,9 @@ import { optimizePrompt, evaluatePrompt } from '../../../utils/api';
 import { PromptEvaluationResult, PromptOptimizationStrategyType } from '../../../types/prompt';
 import PerformanceBenchmark from './PerformanceBenchmark';
 import { performanceTester } from '../../../utils/performance';
+import { useToast } from '../../../context/ToastContext';
+import LoadingSpinner from '../../../components/ui/LoadingSpinner';
+
 
 interface PromptOptimizationSettingsProps {
   promptId: string;
@@ -16,9 +19,14 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
   const [feedback, setFeedback] = useState<string>('');
   const [performanceMode, setPerformanceMode] = useState<boolean>(false);
 
+  const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
+  const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
+  const { showToast } = useToast();
+
+
   const handleOptimize = async () => {
     if (!promptId) {
-      alert('Please select or create a prompt first.');
+      showToast('Please select or create a prompt first.', 'warning');
       return;
     }
     
@@ -42,12 +50,27 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
     } catch (error) {
       stopMeasurement();
       alert(`Optimization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+
+    setIsOptimizing(true);
+    try {
+      console.log(`Optimizing prompt ${promptId} using ${optimizationStrategy}...`);
+      // TODO: Call API to trigger optimization (2.3)
+      const response = await optimizePrompt(promptId, optimizationStrategy);
+      if (response.success) {
+        showToast(`Optimization completed successfully using ${optimizationStrategy}!`, 'success');
+      } else {
+        showToast(`Optimization failed: ${response.error}`, 'error');
+      }
+    } catch (error) {
+      showToast('An error occurred during optimization', 'error');
+    } finally {
+      setIsOptimizing(false);
     }
   };
 
   const handleEvaluate = async () => {
     if (!promptId) {
-      alert('Please select or create a prompt first.');
+      showToast('Please select or create a prompt first.', 'warning');
       return;
     }
 
@@ -92,6 +115,38 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
     } catch (error) {
       stopMeasurement();
       alert(`Evaluation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+=======
+    
+    if (!evaluationMetric || evaluationScore < 0 || evaluationScore > 100) {
+      showToast('Please provide a valid metric and score (0-100)', 'warning');
+      return;
+    }
+    
+    setIsEvaluating(true);
+    try {
+      const evaluationResult: PromptEvaluationResult = {
+        promptId,
+        version: 'current', // In a real scenario, this would be the actual version
+        metric: evaluationMetric,
+        score: evaluationScore,
+        feedback: feedback,
+        timestamp: new Date().toISOString(),
+      };
+      console.log(`Evaluating prompt ${promptId} with score ${evaluationScore}...`);
+      // TODO: Call API to submit evaluation (2.3)
+      const response = await evaluatePrompt(promptId, evaluationResult);
+      if (response.success) {
+        showToast(`Evaluation submitted successfully! Score: ${evaluationScore}`, 'success');
+        // Reset form
+        setEvaluationScore(0);
+        setFeedback('');
+      } else {
+        showToast(`Evaluation failed: ${response.error}`, 'error');
+      }
+    } catch (error) {
+      showToast('An error occurred during evaluation', 'error');
+    } finally {
+      setIsEvaluating(false);
     }
   };
 
@@ -119,6 +174,11 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
           />
           Performance Mode
         </label>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <Button onClick={handleOptimize} disabled={!promptId || isOptimizing}>
+          {isOptimizing ? 'Optimizing...' : 'Run Optimization'}
+        </Button>
+        {isOptimizing && <LoadingSpinner size="small" inline />}
       </div>
       <p style={{ fontSize: '0.9em', color: '#666', marginTop: '10px' }}>
         Leverages an additional language model to generate or refine the original prompt, or employs mathematical principles for precise enhancements. (Section 2.3)
@@ -137,7 +197,12 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
         <label htmlFor="evaluation-feedback">Feedback:</label>
         <textarea id="evaluation-feedback" value={feedback} onChange={(e) => setFeedback(e.target.value)} rows={3} style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }} />
       </div>
-      <Button onClick={handleEvaluate} disabled={!promptId}>Submit Evaluation</Button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <Button onClick={handleEvaluate} disabled={!promptId || isEvaluating}>
+          {isEvaluating ? 'Submitting...' : 'Submit Evaluation'}
+        </Button>
+        {isEvaluating && <LoadingSpinner size="small" inline />}
+      </div>
       <p style={{ fontSize: '0.9em', color: '#666', marginTop: '10px' }}>
         Comprehensive evaluation metrics, leveraging built-in evaluation flows to assess prompt quality and effectiveness. (Section 2.3)
       </p>

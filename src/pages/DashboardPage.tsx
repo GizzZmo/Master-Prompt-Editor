@@ -23,8 +23,8 @@ const DashboardPage: React.FC = () => {
           <p>Latest prompt updates, workflow runs, and system alerts.</p>
           {/* TODO: Display recent activities/logs (2.1, 6.2) */}
           <ul>
-            <li>Prompt 'marketing-campaign-v1.2.0' updated.</li>
-            <li>Workflow 'CustomerOnboarding' executed successfully.</li>
+            <li>Prompt &apos;marketing-campaign-v1.2.0&apos; updated.</li>
+            <li>Workflow &apos;CustomerOnboarding&apos; executed successfully.</li>
             <li>Alert: High latency detected on image generation task.</li>
           </ul>
         </div>
