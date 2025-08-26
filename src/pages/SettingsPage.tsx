@@ -46,7 +46,7 @@ const SettingsPage: React.FC = () => {
             Enable Explainable AI (XAI) features
           </label>
           <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
-            Helps users trust the product's capabilities and understand how AI arrived at its output. (Section 4.2)
+            Helps users trust the product&apos;s capabilities and understand how AI arrived at its output. (Section 4.2)
           </p>
         </div>
 
