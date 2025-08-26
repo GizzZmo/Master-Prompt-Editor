@@ -3,6 +3,8 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import { AIWorkflow, AIWorkflowStep } from '../../../types/ai';
 import { createWorkflow, executeWorkflow } from '../../../utils/api';
+import { useToast } from '../../../context/ToastContext';
+import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 
 // Dummy component for a workflow node (visual representation)
 const WorkflowNode: React.FC<{ step: AIWorkflowStep }> = ({ step }) => {
@@ -20,6 +22,9 @@ const WorkflowBuilder: React.FC = () => {
   const [workflowSteps, setWorkflowSteps] = useState<AIWorkflowStep[]>([]);
   const [newStepName, setNewStepName] = useState('');
   const [newStepType, setNewStepType] = useState<AIWorkflowStep['taskType']>('text-generation');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
+  const { showToast } = useToast();
 
   const handleAddStep = () => {
     if (newStepName.trim() && newStepType) {
@@ -28,11 +33,24 @@ const WorkflowBuilder: React.FC = () => {
         { id: `step-${prev.length + 1}`, name: newStepName, taskType: newStepType, inputMapping: {}, outputMapping: {} }
       ]);
       setNewStepName('');
+      showToast(`Added step: ${newStepName}`, 'success');
+    } else {
+      showToast('Please provide a step name', 'warning');
     }
   };
 
   const handleSaveWorkflow = async () => {
-    if (workflowName.trim() && workflowSteps.length > 0) {
+    if (!workflowName.trim()) {
+      showToast('Please provide a workflow name', 'warning');
+      return;
+    }
+    if (workflowSteps.length === 0) {
+      showToast('Please add at least one step', 'warning');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
       const newWorkflow: Partial<AIWorkflow> = {
         name: workflowName,
         description: workflowDescription,
@@ -45,29 +63,38 @@ const WorkflowBuilder: React.FC = () => {
       // TODO: Call API to save workflow (3.2)
       const response = await createWorkflow(newWorkflow);
       if (response.success) {
-        alert('Workflow saved successfully!');
+        showToast('Workflow saved successfully!', 'success');
         console.log('Saved Workflow:', response.data);
       } else {
-        alert(`Failed to save workflow: ${response.error}`);
+        showToast(`Failed to save workflow: ${response.error}`, 'error');
       }
-    } else {
-      alert('Please provide a workflow name and add at least one step.');
+    } catch (error) {
+      showToast('An error occurred while saving', 'error');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleExecuteWorkflow = async () => {
     if (!workflowName) {
-      alert('Please save or load a workflow first.');
+      showToast('Please save or load a workflow first', 'warning');
       return;
     }
-    // TODO: A real execution would require initial inputs and potentially prompt mapping (3.2)
-    alert('Executing workflow (conceptual)... Check console for mock output.');
-    const response = await executeWorkflow('mock-workflow-id', { text: 'Initial workflow input.' });
-    if (response.success) {
-      console.log('Workflow execution log:', response.data);
-      alert('Workflow execution initiated successfully!');
-    } else {
-      alert(`Workflow execution failed: ${response.error}`);
+
+    setIsExecuting(true);
+    try {
+      // TODO: A real execution would require initial inputs and potentially prompt mapping (3.2)
+      const response = await executeWorkflow('mock-workflow-id', { text: 'Initial workflow input.' });
+      if (response.success) {
+        console.log('Workflow execution log:', response.data);
+        showToast('Workflow execution completed successfully!', 'success');
+      } else {
+        showToast(`Workflow execution failed: ${response.error}`, 'error');
+      }
+    } catch (error) {
+      showToast('An error occurred during execution', 'error');
+    } finally {
+      setIsExecuting(false);
     }
   };
 
@@ -132,9 +159,15 @@ const WorkflowBuilder: React.FC = () => {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '10px' }}>
-        <Button onClick={handleSaveWorkflow}>Save Workflow</Button>
-        <Button onClick={handleExecuteWorkflow} variant="primary" disabled={workflowSteps.length === 0}>Execute Workflow</Button>
+      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <Button onClick={handleSaveWorkflow} disabled={isSaving}>
+          {isSaving ? 'Saving...' : 'Save Workflow'}
+        </Button>
+        {isSaving && <LoadingSpinner size="small" inline />}
+        <Button onClick={handleExecuteWorkflow} variant="primary" disabled={workflowSteps.length === 0 || isExecuting}>
+          {isExecuting ? 'Executing...' : 'Execute Workflow'}
+        </Button>
+        {isExecuting && <LoadingSpinner size="small" inline />}
       </div>
 
       <p style={{ fontSize: '0.9em', color: '#666', marginTop: '20px' }}>
