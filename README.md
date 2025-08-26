@@ -2,6 +2,17 @@
 # The AI Orchestrator: A Master Prompt Editor and Advanced AI Toolkit
 
 [![Master-Prompt-Editor CI](https://github.com/GizzZmo/Master-Prompt-Editor/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/GizzZmo/Master-Prompt-Editor/actions/workflows/ci.yml)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/GizzZmo/Master-Prompt-Editor?sort=semver)](https://github.com/GizzZmo/Master-Prompt-Editor/releases)
+[![GitHub stars](https://img.shields.io/github/stars/GizzZmo/Master-Prompt-Editor)](https://github.com/GizzZmo/Master-Prompt-Editor/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/GizzZmo/Master-Prompt-Editor)](https://github.com/GizzZmo/Master-Prompt-Editor/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/GizzZmo/Master-Prompt-Editor)](https://github.com/GizzZmo/Master-Prompt-Editor/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/GizzZmo/Master-Prompt-Editor)](https://github.com/GizzZmo/Master-Prompt-Editor/pulls)
+[![GitHub last commit](https://img.shields.io/github/last-commit/GizzZmo/Master-Prompt-Editor)](https://github.com/GizzZmo/Master-Prompt-Editor/commits/main)
+[![GitHub repo size](https://img.shields.io/github/repo-size/GizzZmo/Master-Prompt-Editor)](https://github.com/GizzZmo/Master-Prompt-Editor)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-404D59?logo=express)](https://expressjs.com/)
 
 ## Executive Summary
 
