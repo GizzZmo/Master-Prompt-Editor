@@ -230,13 +230,19 @@ export class PerformanceTester {
   /**
    * Simulate an API call for load testing
    */
-  private async simulateAPICall(promptId: string, strategy?: string): Promise<void> {
+  private async simulateAPICall(
+    promptId: string,
+    strategy?: string,
+    minDelay: number = 50,
+    maxDelay: number = 250,
+    failureRate: number = 0.05
+  ): Promise<void> {
     // Simulate network delay
-    const delay = Math.random() * 200 + 50; // 50-250ms
+    const delay = Math.random() * (maxDelay - minDelay) + minDelay; // configurable delay range
     await new Promise(resolve => setTimeout(resolve, delay));
 
     // Simulate occasional failures
-    if (Math.random() < 0.05) { // 5% failure rate
+    if (Math.random() < failureRate) { // configurable failure rate
       throw new Error('Simulated API failure');
     }
   }
