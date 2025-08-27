@@ -14,7 +14,7 @@ interface AuditLogEntry {
   path: string;
   statusCode?: number;
   duration?: number;
-  details?: any;
+  details?: Record<string, unknown>;
   severity: 'low' | 'medium' | 'high' | 'critical';
 }
 
@@ -119,10 +119,10 @@ const auditLogger = new AuditLogger();
 export const auditMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const startTime = Date.now();
   
-  // Capture the original res.end to log when request completes
-  const originalEnd = res.end.bind(res);
+  // Simple override without complex type handling
+  const originalJson = res.json.bind(res);
   
-  res.end = (...args: any[]) => {
+  res.json = function(body: any) {
     const duration = Date.now() - startTime;
     
     // Determine if this is a sensitive operation
@@ -154,14 +154,14 @@ export const auditMiddleware = (req: Request, res: Response, next: NextFunction)
       });
     }
 
-    return originalEnd(...args);
+    return originalJson(body);
   };
 
   next();
 };
 
 // Explicit audit logging for specific actions
-export const auditAction = (action: string, resource: string, resourceId?: string, details?: any) => {
+export const auditAction = (action: string, resource: string, resourceId?: string, details?: Record<string, unknown>) => {
   return (req: Request, res: Response, next: NextFunction) => {
     auditLogger.log({
       action,

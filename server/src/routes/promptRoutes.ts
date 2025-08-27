@@ -22,7 +22,6 @@ interface PromptVersion {
 import { 
   validatePromptCreation, 
   validatePromptUpdate, 
-  validatePromptEvaluation,
   validatePagination,
   validateId
 } from '../middleware/validation';

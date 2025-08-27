@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import aiRoutes from './routes/aiRoutes';
 import promptRoutes from './routes/promptRoutes';
@@ -105,7 +105,7 @@ app.get('/api/security/status',
 );
 
 // Error handling middleware
-app.use((err: any, req: Request, res: Response, next: any) => {
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   console.error('Server error:', err);
   
   // Log security-related errors
@@ -116,7 +116,7 @@ app.use((err: any, req: Request, res: Response, next: any) => {
   // Don't expose internal errors in production
   const isDevelopment = process.env.NODE_ENV === 'development';
   
-  res.status(err.status || 500).json({
+  res.status((err as Error & { status?: number }).status || 500).json({
     error: isDevelopment ? err.message : 'Internal server error',
     ...(isDevelopment && { stack: err.stack })
   });
