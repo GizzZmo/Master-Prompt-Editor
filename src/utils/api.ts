@@ -3,7 +3,7 @@
 import { Prompt, AIModelType, AITaskExecutionLog, AIWorkflow, PromptEvaluationResult, PromptOptimizationStrategyType } from '../types/ai';
 
 // API base URL configuration - uses environment variable or falls back to relative path
-const BASE_URL = process.env.REACT_APP_API_URL || '/api';
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 /**
  * Generic HTTP request helper with error handling.
