@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getAIModels, getExecutionLogs } from '../../../utils/api';
 import { AIModelType, AITaskExecutionLog } from '../../../types/ai';
 import { performanceTester, PerformanceMetric } from '../../../utils/performance';
@@ -11,6 +11,10 @@ const AIManagerDashboard: React.FC = () => {
   const [errorModels, setErrorModels] = useState<string | null>(null);
   const [errorLogs, setErrorLogs] = useState<string | null>(null);
   const [systemMetrics, setSystemMetrics] = useState<PerformanceMetric[]>([]);
+
+  // Metrics collection configuration
+  const metricsPaused = false; // Could be controlled by props or context
+  const metricsIntervalMs = 1000; // 1 second interval
 
   useEffect(() => {
     const fetchModels = async () => {
