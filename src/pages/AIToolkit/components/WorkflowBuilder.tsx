@@ -3,7 +3,7 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import { AIWorkflow, AIWorkflowStep } from '../../../types/ai';
 import { createWorkflow, executeWorkflow } from '../../../utils/api';
-import { useToast } from '../../../context/ToastContext';
+import { useToast } from '../../../context/toastContextHelpers';
 import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 
 // Dummy component for a workflow node (visual representation)

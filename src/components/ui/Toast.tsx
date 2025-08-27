@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 export interface ToastProps {
   message: string;
@@ -16,17 +16,23 @@ const Toast: React.FC<ToastProps> = ({
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-      onClose?.();
-    }, duration);
+    if (duration > 0) {
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+        onClose?.();
+      }, duration);
 
-    return () => clearTimeout(timer);
+      return () => clearTimeout(timer);
+    }
   }, [duration, onClose]);
 
-  if (!isVisible) return null;
+  const handleClose = () => {
+    setIsVisible(false);
+    onClose?.();
+  };
 
-  const getToastStyles = () => {
+  // Memoize styles for better performance
+  const toastStyles = useMemo(() => {
     const baseStyles = {
       position: 'fixed' as const,
       top: '20px',
@@ -52,9 +58,10 @@ const Toast: React.FC<ToastProps> = ({
     };
 
     return { ...baseStyles, ...typeStyles[type] };
-  };
+  }, [type]);
 
-  const getIcon = () => {
+  // Memoize icon for better performance  
+  const icon = useMemo(() => {
     switch (type) {
       case 'success':
         return '✓';
@@ -65,7 +72,9 @@ const Toast: React.FC<ToastProps> = ({
       default:
         return 'ℹ';
     }
-  };
+  }, [type]);
+
+  if (!isVisible) return null;
 
   return (
     <>
@@ -83,14 +92,11 @@ const Toast: React.FC<ToastProps> = ({
           }
         `}
       </style>
-      <div style={getToastStyles()}>
-        <span>{getIcon()}</span>
+      <div style={toastStyles}>
+        <span aria-hidden="true">{icon}</span>
         <span>{message}</span>
         <button
-          onClick={() => {
-            setIsVisible(false);
-            onClose?.();
-          }}
+          onClick={handleClose}
           style={{
             background: 'none',
             border: 'none',
@@ -101,6 +107,7 @@ const Toast: React.FC<ToastProps> = ({
             padding: '0',
           }}
           aria-label="Close notification"
+          type="button"
         >
           ×
         </button>

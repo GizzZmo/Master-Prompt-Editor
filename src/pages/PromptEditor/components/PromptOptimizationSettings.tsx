@@ -5,6 +5,7 @@ import { PromptEvaluationResult, PromptOptimizationStrategyType } from '../../..
 import PerformanceBenchmark from './PerformanceBenchmark';
 import { performanceTester } from '../../../utils/performance';
 import { useToast } from '../../../context/ToastContext';
+import { useToast } from '../../../context/toastContextHelpers';
 import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 
 
@@ -115,7 +116,6 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
     } catch (error) {
       stopMeasurement();
       alert(`Evaluation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-=======
     
     if (!evaluationMetric || evaluationScore < 0 || evaluationScore > 100) {
       showToast('Please provide a valid metric and score (0-100)', 'warning');

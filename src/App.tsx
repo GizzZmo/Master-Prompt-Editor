@@ -8,7 +8,7 @@ import SettingsPage from './pages/SettingsPage';
 import { AIProvider } from './context/AIContext';
 import { ToastProvider } from './context/ToastContext';
 import KeyboardShortcuts from './components/ui/KeyboardShortcuts';
-import { useToast } from './context/ToastContext';
+import { useToast } from './context/toastContextHelpers';
 
 function AppContent() {
   const { showToast } = useToast();

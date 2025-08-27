@@ -1,25 +1,22 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import Toast, { ToastProps } from '../components/ui/Toast';
-
-interface ToastContextType {
-  showToast: (message: string, type?: ToastProps['type'], duration?: number) => void;
-}
-
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
+import { useState, ReactNode, useCallback } from 'react';
+import Toast from '../components/ui/Toast';
+import { ToastItem } from '../types/toast';
+import { ToastContext } from './toastContextHelpers';
 
 interface ToastProviderProps {
   children: ReactNode;
 }
 
-interface ToastItem extends ToastProps {
-  id: string;
-}
-
 export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const showToast = (message: string, type: ToastProps['type'] = 'info', duration = 5000) => {
-    const id = Date.now().toString();
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
+
+  const showToast = useCallback((message: string, type: ToastItem['type'] = 'info', duration = 5000) => {
+    // Use crypto.randomUUID if available, fallback to timestamp-based ID
+    const id = crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const newToast: ToastItem = {
       id,
       message,
@@ -29,11 +26,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     };
 
     setToasts(prev => [...prev, newToast]);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  };
+  }, [removeToast]);
 
   return (
     <ToastContext.Provider value={{ showToast }}>
@@ -55,12 +48,4 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       </div>
     </ToastContext.Provider>
   );
-};
-
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (context === undefined) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
-  return context;
 };
