@@ -32,33 +32,63 @@ This project is structured as a monorepo containing both a frontend (React/TypeS
 
 ```
 . # Root Directory
-├── public/             # Public assets (e.g., index.html)
-├── src/                # Frontend Source Code (React/TypeScript)
-│   ├── assets/         # Static assets like images
-│   ├── components/     # Reusable UI components
-│   │   ├── layout/     # Layout-specific components (Header, Sidebar)
-│   │   └── ui/         # Generic UI components (Button, Input)
-│   ├── context/        # React Context for global state
-│   ├── hooks/          # Custom React hooks
-│   ├── pages/          # Top-level application pages
-│   │   ├── AIToolkit/  # Advanced AI Toolkit module
-│   │   └── PromptEditor/ # Master Prompt Editor module
-│   ├── styles/         # Global styles
-│   ├── types/          # TypeScript type definitions (shared)
-│   ├── utils/          # Utility functions (e.g., API calls)
-│   ├── App.tsx         # Main application component
-│   └── index.tsx       # Entry point for React app
-├── server/             # Backend Source Code
-│   ├── src/            # Server-side source
-│   │   ├── config/     # Configuration files
-│   │   ├── data/       # Mock data stores
-│   │   ├── routes/     # API route definitions
-│   │   └── services/   # Business logic services
-│   │   └── index.ts    # Server entry point
-│   └── package.json    # Backend dependencies
-├── package.json        # Root dependencies (e.g., for monorepo tools, concurrently)
-├── tsconfig.json       # TypeScript configuration
-└── README.md           # This file
+├── .github/             # GitHub workflows and templates
+├── ISSUE_TEMPLATE/      # Issue template files
+│   ├── bug_report.md    # Bug report template
+│   └── feature_request.md # Feature request template
+├── assets/              # Build artifacts and static assets
+├── client/              # Alternative client implementation
+│   └── src/             # Client source files
+├── public/              # Public assets (e.g., index.html)
+├── src/                 # Frontend Source Code (React/TypeScript)
+│   ├── assets/          # Static assets like images
+│   │   └── neon-sage/   # Neon Sage branding assets
+│   ├── components/      # Reusable UI components
+│   │   ├── layout/      # Layout-specific components (Header, Sidebar)
+│   │   └── ui/          # Generic UI components (Button, Input)
+│   ├── context/         # React Context for global state
+│   │   ├── AIContext.tsx      # AI-related state management
+│   │   ├── ToastContext.tsx   # Toast notification system
+│   │   └── *Helpers.ts        # Context helper functions
+│   ├── hooks/           # Custom React hooks
+│   │   └── usePromptManagement.ts # Prompt management hook
+│   ├── pages/           # Top-level application pages
+│   │   ├── AIToolkit/   # Advanced AI Toolkit module
+│   │   ├── PromptEditor/ # Master Prompt Editor module
+│   │   ├── DashboardPage.tsx # Main dashboard
+│   │   └── SettingsPage.tsx  # Settings page
+│   ├── styles/          # Global styles
+│   │   └── global.css   # Global CSS styles
+│   ├── types/           # TypeScript type definitions (shared)
+│   │   ├── ai.ts        # AI-related types
+│   │   ├── prompt.ts    # Prompt-related types
+│   │   ├── toast.ts     # Toast notification types
+│   │   └── ai-context.ts # AI context types
+│   ├── utils/           # Utility functions
+│   │   ├── api.ts       # API client functions
+│   │   ├── exportImport.ts # Import/export utilities
+│   │   └── performance.ts  # Performance monitoring
+│   ├── App.tsx          # Main application component
+│   └── index.tsx        # Entry point for React app
+├── server/              # Backend Source Code
+│   ├── src/             # Server-side source
+│   │   ├── config/      # Configuration files
+│   │   ├── data/        # Mock data stores
+│   │   ├── routes/      # API route definitions
+│   │   ├── services/    # Business logic services
+│   │   └── index.ts     # Server entry point
+│   ├── package.json     # Backend dependencies
+│   └── tsconfig.json    # Backend TypeScript config
+├── CONTRIBUTING.md      # Contribution guidelines
+├── CODE_OF_CONDUCT.md   # Code of conduct
+├── SECURITY.md          # Security policy
+├── SECURITY_OPTIMIZATION_REPORT.md # Security audit report
+├── PULL_REQUEST_TEMPLATE.md # PR template
+├── package.json         # Root dependencies and scripts
+├── tsconfig.json        # Frontend TypeScript configuration
+├── tsconfig.build.json  # Build-specific TypeScript config
+├── vite.config.ts       # Vite build configuration
+└── README.md            # This file
 ```
 
 ## Frontend Features (Conceptual)
@@ -85,24 +115,100 @@ This project is structured as a monorepo containing both a frontend (React/TypeS
 *   **Services**: Business logic for interacting with (mock) LLM providers, managing prompt storage, orchestrating chained AI tasks, and handling evaluation metrics.
 *   **Data Storage**: Conceptualized storage for prompts, versions, and performance logs (mocked as JSON files).
 
-## Getting Started (Conceptual)
+## Getting Started
 
-To run this project, you would typically follow these steps:
+### Prerequisites
 
-1.  **Clone the repository:**
-    `git clone [repository-url]`
-    `cd [project-folder]`
+- Node.js (v16 or higher)
+- npm (v7 or higher)
 
-2.  **Install dependencies (root, frontend, and backend):**
-    `npm run install:all`
+### Installation
 
-3.  **Start the development servers (frontend and backend concurrently):**
-    `npm run dev`
-    *   (Alternatively, for separate starts:)
-    *   Start the backend server: `npm run dev:server`
-    *   Start the frontend application: `npm run dev:client`
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/GizzZmo/Master-Prompt-Editor.git
+   cd Master-Prompt-Editor
+   ```
 
-(Note: These commands are conceptual and depend on the actual `package.json` scripts implemented.)
+2. **Install dependencies:**
+   ```bash
+   # Install root dependencies
+   npm install
+
+   # Install server dependencies
+   npm install --prefix server
+
+   # Install client dependencies (if using alternative client)
+   npm install --prefix client
+   ```
+
+### Development
+
+1. **Start the development environment:**
+   ```bash
+   # Start all services (frontend, server, and client concurrently)
+   npm run dev
+   ```
+
+   **Or start services individually:**
+   ```bash
+   # Start the backend server
+   npm run dev:server
+
+   # Start the frontend application
+   npm run dev:frontend
+
+   # Start the alternative client
+   npm run dev:client
+   ```
+
+2. **Access the application:**
+   - Frontend: http://localhost:3000 (or the port shown in terminal)
+   - Backend API: http://localhost:3001 (or configured port)
+
+### Building for Production
+
+```bash
+# Build all components
+npm run build:all
+
+# Or build individually
+npm run build:frontend
+npm run build:server
+npm run build:client
+```
+
+### Code Quality
+
+```bash
+# Run linting
+npm run lint:all
+
+# Preview production build
+npm run preview
+```
+
+## Security & Performance
+
+This project implements comprehensive security measures and performance optimizations. For detailed information, see [SECURITY_OPTIMIZATION_REPORT.md](SECURITY_OPTIMIZATION_REPORT.md).
+
+### Key Security Features
+
+- **Enhanced Import/Export Security**: File type validation, size limits, content validation
+- **Content Security Policy (CSP)**: Comprehensive CSP headers to prevent XSS attacks
+- **Security Headers**: Protection against MIME sniffing, clickjacking, and other attacks
+- **Toast System Security**: Secure random ID generation and message sanitization
+- **Keyboard Shortcuts Security**: Proper event handling and conflict prevention
+
+### Performance Optimizations
+
+- **Bundle Optimization**: Tree shaking, code splitting, and efficient bundling
+- **Memory Management**: Proper cleanup and memory leak prevention
+- **Rendering Performance**: Optimized React rendering and DOM operations
+
+### Security Policy
+
+Please review our [Security Policy](SECURITY.md) for information on reporting vulnerabilities.
 
 ## Responsible AI Considerations
 
@@ -111,6 +217,17 @@ The project acknowledges inherent AI limitations (bias, insufficient context, un
 *   Embedding Responsible AI Development Principles (algorithmic audits, explainability, data governance, cybersecurity).
 *   Mitigating Ethical Risks (careful prompt crafting, continuous monitoring).
 *   Strict Privacy Protocols.
+
+## Contributing
+
+We welcome contributions to the Master-Prompt-Editor project! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on:
+
+- How to contribute
+- Coding standards
+- Issue reporting
+- Pull request process
+
+Please also read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
 
 ## Future Outlook
 
