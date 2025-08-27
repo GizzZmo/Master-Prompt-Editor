@@ -200,7 +200,7 @@ export class PerformanceTester {
               }
 
               // Wait a bit before next request
-              await new Promise(resolve => setTimeout(resolve, 100));
+              await new Promise(resolve => setTimeout(resolve, Math.random() * 200 + 50)); // e.g. 50-250ms random delay
             }
             resolve();
           }, userDelay);
