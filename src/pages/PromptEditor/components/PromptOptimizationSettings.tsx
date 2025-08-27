@@ -29,6 +29,7 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       showToast('Please select or create a prompt first.', 'warning');
       return;
     }
+
     
     setIsOptimizing(true);
     console.log(`Optimizing prompt ${promptId} using ${optimizationStrategy}...`);
@@ -40,6 +41,7 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
     );
 
     try {
+      console.log(`Optimizing prompt ${promptId} using ${optimizationStrategy}...`);
       const response = await optimizePrompt(promptId, optimizationStrategy);
       const performanceMetric = stopMeasurement();
       
@@ -50,7 +52,9 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       }
     } catch (error) {
       stopMeasurement();
+
       showToast('An error occurred during optimization', 'error');
+
     } finally {
       setIsOptimizing(false);
     }
@@ -112,7 +116,9 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       }
     } catch (error) {
       stopMeasurement();
+
       showToast('An error occurred during evaluation', 'error');
+
     } finally {
       setIsEvaluating(false);
     }
@@ -133,6 +139,7 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
         </select>
       </div>
       <div style={{ marginTop: '15px', display: 'flex', gap: '10px', alignItems: 'center' }}>
+
         <Button onClick={handleOptimize} disabled={!promptId || isOptimizing}>
           {isOptimizing ? 'Optimizing...' : 'Run Optimization'}
         </Button>
@@ -145,6 +152,7 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
           />
           Performance Mode
         </label>
+
       </div>
       <p style={{ fontSize: '0.9em', color: '#666', marginTop: '10px' }}>
         Leverages an additional language model to generate or refine the original prompt, or employs mathematical principles for precise enhancements. (Section 2.3)

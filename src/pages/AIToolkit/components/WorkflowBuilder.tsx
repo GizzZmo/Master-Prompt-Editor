@@ -11,7 +11,7 @@ const WorkflowNode: React.FC<{ step: AIWorkflowStep }> = ({ step }) => {
   return (
     <div style={{ border: '1px solid #007bff', padding: '10px', margin: '5px', borderRadius: '5px', backgroundColor: '#e6f3ff', textAlign: 'center' }}>
       <strong>{step.name}</strong><br/>
-      <small>({step.taskType})</small>
+      <small>({step.taskType || step.type})</small>
     </div>
   );
 };
@@ -30,7 +30,16 @@ const WorkflowBuilder: React.FC = () => {
     if (newStepName.trim() && newStepType) {
       setWorkflowSteps(prev => [
         ...prev,
-        { id: `step-${prev.length + 1}`, name: newStepName, taskType: newStepType, inputMapping: {}, outputMapping: {} }
+        { 
+          id: `step-${prev.length + 1}`, 
+          name: newStepName, 
+          type: 'prompt', // Use valid type from AIWorkflowStep
+          config: {},
+          order: prev.length + 1,
+          taskType: newStepType, 
+          inputMapping: {}, 
+          outputMapping: {} 
+        }
       ]);
       setNewStepName('');
       showToast(`Added step: ${newStepName}`, 'success');
@@ -51,22 +60,19 @@ const WorkflowBuilder: React.FC = () => {
 
     setIsSaving(true);
     try {
-      const newWorkflow: Partial<AIWorkflow> = {
+      const newWorkflow: Omit<AIWorkflow, 'id' | 'createdAt' | 'updatedAt'> = {
         name: workflowName,
         description: workflowDescription,
         steps: workflowSteps,
-        createdBy: 'user_id_mock',
-        createdAt: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-        status: 'draft',
       };
       // TODO: Call API to save workflow (3.2)
       const response = await createWorkflow(newWorkflow);
-      if (response.success) {
+      if ('success' in response && response.success) {
         showToast('Workflow saved successfully!', 'success');
-        console.log('Saved Workflow:', response.data);
+        console.log('Saved Workflow:', 'data' in response ? response.data : response);
       } else {
-        showToast(`Failed to save workflow: ${response.error}`, 'error');
+        const errorMessage = 'error' in response ? response.error : 'Unknown error';
+        showToast(`Failed to save workflow: ${errorMessage}`, 'error');
       }
     } catch (error) {
       showToast('An error occurred while saving', 'error');
@@ -84,12 +90,14 @@ const WorkflowBuilder: React.FC = () => {
     setIsExecuting(true);
     try {
       // TODO: A real execution would require initial inputs and potentially prompt mapping (3.2)
-      const response = await executeWorkflow('mock-workflow-id', { text: 'Initial workflow input.' });
-      if (response.success) {
-        console.log('Workflow execution log:', response.data);
+      const response = await executeWorkflow('mock-workflow-id');
+      if ('success' in response && response.success) {
+        const responseData = 'data' in response ? response.data : response;
+        console.log('Workflow execution log:', responseData);
         showToast('Workflow execution completed successfully!', 'success');
       } else {
-        showToast(`Workflow execution failed: ${response.error}`, 'error');
+        const errorMessage = 'error' in response ? response.error : 'Unknown error';
+        showToast(`Workflow execution failed: ${errorMessage}`, 'error');
       }
     } catch (error) {
       showToast('An error occurred during execution', 'error');
