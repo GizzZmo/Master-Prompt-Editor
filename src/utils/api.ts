@@ -192,7 +192,7 @@ export const executeWorkflow = async (workflowId: string): Promise<AITaskExecuti
   });
 };
 
-export const optimizePrompt = async (promptId: string, strategy: PromptOptimizationStrategyType): Promise<{ success: boolean; data?: any; error?: string }> => {
+export const optimizePrompt = async (promptId: string, strategy: PromptOptimizationStrategyType): Promise<{ success: boolean; data?: Prompt; error?: string }> => {
   try {
     const response = await request<Prompt>(`/prompts/${promptId}/optimize`, {
       method: 'POST',
@@ -208,7 +208,7 @@ export const optimizePrompt = async (promptId: string, strategy: PromptOptimizat
   }
 };
 
-export const evaluatePrompt = async (promptId: string, evaluationResult: PromptEvaluationResult): Promise<{ success: boolean; data?: any; error?: string }> => {
+export const evaluatePrompt = async (promptId: string, evaluationResult: PromptEvaluationResult): Promise<{ success: boolean; data?: PromptEvaluationResult; error?: string }> => {
   try {
     const response = await request<PromptEvaluationResult>(`/prompts/${promptId}/evaluate`, {
       method: 'POST',

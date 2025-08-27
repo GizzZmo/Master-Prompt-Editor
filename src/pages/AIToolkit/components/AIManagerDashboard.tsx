@@ -3,6 +3,10 @@ import { getAIModels, getExecutionLogs } from '../../../utils/api';
 import { AIModelType, AITaskExecutionLog } from '../../../types/ai';
 import { performanceTester, PerformanceMetric } from '../../../utils/performance';
 
+// Constants for metrics collection
+const METRICS_INTERVAL_MS = 5000; // 5 seconds
+const METRICS_PAUSED = false;
+
 const AIManagerDashboard: React.FC = () => {
   const [availableModels, setAvailableModels] = useState<AIModelType[]>([]);
   const [executionLogs, setExecutionLogs] = useState<AITaskExecutionLog[]>([]);
@@ -46,13 +50,13 @@ const AIManagerDashboard: React.FC = () => {
     collectSystemMetrics();
 
     // Set up periodic metrics collection, only if not paused
-    if (!metricsPaused) {
-      const intervalId = setInterval(collectSystemMetrics, metricsIntervalMs);
+    if (!METRICS_PAUSED) {
+      const intervalId = setInterval(collectSystemMetrics, METRICS_INTERVAL_MS);
       return () => clearInterval(intervalId);
     }
     // If paused, no interval
     return undefined;
-  }, [metricsIntervalMs, metricsPaused]);
+  }, []); // Empty dependency array since we're using constants
   const formatBytes = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;

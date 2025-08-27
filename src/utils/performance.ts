@@ -100,7 +100,11 @@ export class PerformanceTester {
       value: memoryInfo && typeof memoryInfo.usedJSHeapSize === "number" ? memoryInfo.usedJSHeapSize : 0,
       unit: 'bytes',
       timestamp: new Date().toISOString(),
-      metadata: memoryInfo
+      metadata: memoryInfo ? {
+        usedJSHeapSize: memoryInfo.usedJSHeapSize,
+        totalJSHeapSize: memoryInfo.totalJSHeapSize,
+        jsHeapSizeLimit: memoryInfo.jsHeapSizeLimit
+      } : undefined
     };
 
     this.metrics.push(metric);
@@ -293,10 +297,10 @@ export const performanceTester = new PerformanceTester();
  * Decorator for measuring function performance
  */
 export function measurePerformance(name: string) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       const stopMeasurement = performanceTester.startMeasurement(
         `${target.constructor.name}_${propertyKey}`,
         name
