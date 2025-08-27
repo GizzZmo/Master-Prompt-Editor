@@ -100,7 +100,11 @@ export class PerformanceTester {
       value: memoryInfo && typeof memoryInfo.usedJSHeapSize === "number" ? memoryInfo.usedJSHeapSize : 0,
       unit: 'bytes',
       timestamp: new Date().toISOString(),
-      metadata: memoryInfo
+      metadata: memoryInfo ? {
+        usedJSHeapSize: memoryInfo.usedJSHeapSize,
+        totalJSHeapSize: memoryInfo.totalJSHeapSize,
+        jsHeapSizeLimit: memoryInfo.jsHeapSizeLimit
+      } : undefined
     };
 
     this.metrics.push(metric);
