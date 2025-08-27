@@ -18,8 +18,7 @@ const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ promptId })
 
   const runBenchmark = useCallback(async () => {
     if (!promptId) {
-      alert('Please select a prompt first.');
-      return;
+      showToast('Please select a prompt first.', 'warning');
     }
 
     setIsRunning(true);
