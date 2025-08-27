@@ -8,6 +8,8 @@ import SettingsPage from './pages/SettingsPage';
 import { AIProvider } from './context/AIContext';
 import { ToastProvider } from './context/ToastContext';
 import KeyboardShortcuts from './components/ui/KeyboardShortcuts';
+import ErrorBoundary from './components/ui/ErrorBoundary';
+import PageErrorBoundary from './components/ui/PageErrorBoundary';
 import { useToast } from './context/toastContextHelpers';
 
 function AppContent() {
@@ -41,33 +43,57 @@ function AppContent() {
 
   return (
     <div className="app-container">
-      <Sidebar />
+      <ErrorBoundary>
+        <Sidebar />
+      </ErrorBoundary>
       <div className="main-content">
-        <Header />
+        <ErrorBoundary>
+          <Header />
+        </ErrorBoundary>
         <div className="page-content">
           <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/prompt-editor" element={<PromptEditorPage />} />
-            <Route path="/ai-toolkit" element={<AIToolkitPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/" element={
+              <PageErrorBoundary pageName="Dashboard">
+                <DashboardPage />
+              </PageErrorBoundary>
+            } />
+            <Route path="/prompt-editor" element={
+              <PageErrorBoundary pageName="Prompt Editor">
+                <PromptEditorPage />
+              </PageErrorBoundary>
+            } />
+            <Route path="/ai-toolkit" element={
+              <PageErrorBoundary pageName="AI Toolkit">
+                <AIToolkitPage />
+              </PageErrorBoundary>
+            } />
+            <Route path="/settings" element={
+              <PageErrorBoundary pageName="Settings">
+                <SettingsPage />
+              </PageErrorBoundary>
+            } />
             {/* TODO: Add more routes for specific toolkit functionalities */}
           </Routes>
         </div>
       </div>
-      <KeyboardShortcuts shortcuts={shortcuts} />
+      <ErrorBoundary>
+        <KeyboardShortcuts shortcuts={shortcuts} />
+      </ErrorBoundary>
     </div>
   );
 }
 
 function App() {
   return (
-    <Router>
-      <AIProvider>
-        <ToastProvider>
-          <AppContent />
-        </ToastProvider>
-      </AIProvider>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <AIProvider>
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
+        </AIProvider>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

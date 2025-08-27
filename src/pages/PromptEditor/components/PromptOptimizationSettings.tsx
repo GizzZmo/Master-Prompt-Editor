@@ -30,7 +30,9 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       return;
     }
 
+    
     setIsOptimizing(true);
+    console.log(`Optimizing prompt ${promptId} using ${optimizationStrategy}...`);
     
     // Measure optimization performance
     const stopMeasurement = performanceTester.startMeasurement(
@@ -50,7 +52,9 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       }
     } catch (error) {
       stopMeasurement();
-      showToast(`Optimization failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+
+      showToast('An error occurred during optimization', 'error');
+
     } finally {
       setIsOptimizing(false);
     }
@@ -112,7 +116,9 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       }
     } catch (error) {
       stopMeasurement();
-      showToast(`Evaluation failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+
+      showToast('An error occurred during evaluation', 'error');
+
     } finally {
       setIsEvaluating(false);
     }
@@ -133,6 +139,11 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
         </select>
       </div>
       <div style={{ marginTop: '15px', display: 'flex', gap: '10px', alignItems: 'center' }}>
+
+        <Button onClick={handleOptimize} disabled={!promptId || isOptimizing}>
+          {isOptimizing ? 'Optimizing...' : 'Run Optimization'}
+        </Button>
+        {isOptimizing && <LoadingSpinner size="small" inline />}
         <label style={{ fontSize: '0.9em', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
           <input 
             type="checkbox" 
@@ -141,12 +152,7 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
           />
           Performance Mode
         </label>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <Button onClick={handleOptimize} disabled={!promptId || isOptimizing}>
-          {isOptimizing ? 'Optimizing...' : 'Run Optimization'}
-        </Button>
-        {isOptimizing && <LoadingSpinner size="small" inline />}
+
       </div>
       <p style={{ fontSize: '0.9em', color: '#666', marginTop: '10px' }}>
         Leverages an additional language model to generate or refine the original prompt, or employs mathematical principles for precise enhancements. (Section 2.3)

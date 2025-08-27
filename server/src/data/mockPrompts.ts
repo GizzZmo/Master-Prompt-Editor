@@ -1,4 +1,22 @@
-import { Prompt, PromptVersion } from '../../../src/types/prompt';
+// Local types for server
+interface Prompt {
+  id: string;
+  name: string;
+  description: string;
+  tags: string[];
+  content: string;
+  version: string;
+  versions: PromptVersion[];
+}
+
+interface PromptVersion {
+  id: string;
+  promptId: string;
+  version: string;
+  content: string;
+  createdAt: string;
+  metadata?: Record<string, unknown>;
+}
 
 const mockPromptVersions: PromptVersion[] = [
   {
