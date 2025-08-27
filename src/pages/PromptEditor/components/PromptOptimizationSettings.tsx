@@ -41,7 +41,6 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
     );
 
     try {
-      console.log(`Optimizing prompt ${promptId} using ${optimizationStrategy}...`);
       const response = await optimizePrompt(promptId, optimizationStrategy);
       const performanceMetric = stopMeasurement();
       
