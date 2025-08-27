@@ -87,6 +87,7 @@ export class PerformanceTester {
    */
   measureMemory(id: string): PerformanceMetric {
     interface MemoryInfo {
+      [key: string]: unknown;
       usedJSHeapSize: number;
       totalJSHeapSize?: number;
       jsHeapSizeLimit?: number;
@@ -235,8 +236,8 @@ export class PerformanceTester {
    * Simulate an API call for load testing
    */
   private async simulateAPICall(
-    promptId: string,
-    strategy?: string,
+    _promptId: string,
+    _strategy?: string,
     minDelay: number = 50,
     maxDelay: number = 250,
     failureRate: number = 0.05
@@ -297,10 +298,12 @@ export const performanceTester = new PerformanceTester();
  * Decorator for measuring function performance
  */
 export function measurePerformance(name: string) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+
+  return function (target: { constructor: { name: string } }, propertyKey: string, descriptor: PropertyDescriptor) {
+
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       const stopMeasurement = performanceTester.startMeasurement(
         `${target.constructor.name}_${propertyKey}`,
         name

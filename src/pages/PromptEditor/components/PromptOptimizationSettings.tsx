@@ -4,7 +4,6 @@ import { optimizePrompt, evaluatePrompt } from '../../../utils/api';
 import { PromptEvaluationResult, PromptOptimizationStrategyType } from '../../../types/prompt';
 import PerformanceBenchmark from './PerformanceBenchmark';
 import { performanceTester } from '../../../utils/performance';
-import { useToast } from '../../../context/ToastContext';
 import { useToast } from '../../../context/toastContextHelpers';
 import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 
@@ -30,7 +29,9 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       showToast('Please select or create a prompt first.', 'warning');
       return;
     }
+
     
+    setIsOptimizing(true);
     console.log(`Optimizing prompt ${promptId} using ${optimizationStrategy}...`);
     
     // Measure optimization performance
@@ -44,26 +45,15 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       const performanceMetric = stopMeasurement();
       
       if (response.success) {
-        alert(`Optimization completed for prompt ${promptId} with strategy ${optimizationStrategy}.\nPerformance: ${performanceMetric.value.toFixed(2)}ms`);
-      } else {
-        alert(`Optimization failed: ${response.error}`);
-      }
-    } catch (error) {
-      stopMeasurement();
-      alert(`Optimization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-
-    setIsOptimizing(true);
-    try {
-      console.log(`Optimizing prompt ${promptId} using ${optimizationStrategy}...`);
-      // TODO: Call API to trigger optimization (2.3)
-      const response = await optimizePrompt(promptId, optimizationStrategy);
-      if (response.success) {
-        showToast(`Optimization completed successfully using ${optimizationStrategy}!`, 'success');
+        showToast(`Optimization completed successfully using ${optimizationStrategy}! Performance: ${performanceMetric.value.toFixed(2)}ms`, 'success');
       } else {
         showToast(`Optimization failed: ${response.error}`, 'error');
       }
     } catch (error) {
+      stopMeasurement();
+
       showToast('An error occurred during optimization', 'error');
+
     } finally {
       setIsOptimizing(false);
     }
@@ -74,6 +64,13 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       showToast('Please select or create a prompt first.', 'warning');
       return;
     }
+
+    if (!evaluationMetric || evaluationScore < 0 || evaluationScore > 100) {
+      showToast('Please provide a valid metric and score (0-100)', 'warning');
+      return;
+    }
+    
+    setIsEvaluating(true);
 
     // Measure evaluation performance
     const stopMeasurement = performanceTester.startMeasurement(
@@ -109,34 +106,7 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       }
 
       if (response.success) {
-        alert(`Evaluation submitted for prompt ${promptId}.\nPerformance: ${performanceMetric.value.toFixed(2)}ms`);
-      } else {
-        alert(`Evaluation failed: ${response.error}`);
-      }
-    } catch (error) {
-      stopMeasurement();
-      alert(`Evaluation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    
-    if (!evaluationMetric || evaluationScore < 0 || evaluationScore > 100) {
-      showToast('Please provide a valid metric and score (0-100)', 'warning');
-      return;
-    }
-    
-    setIsEvaluating(true);
-    try {
-      const evaluationResult: PromptEvaluationResult = {
-        promptId,
-        version: 'current', // In a real scenario, this would be the actual version
-        metric: evaluationMetric,
-        score: evaluationScore,
-        feedback: feedback,
-        timestamp: new Date().toISOString(),
-      };
-      console.log(`Evaluating prompt ${promptId} with score ${evaluationScore}...`);
-      // TODO: Call API to submit evaluation (2.3)
-      const response = await evaluatePrompt(promptId, evaluationResult);
-      if (response.success) {
-        showToast(`Evaluation submitted successfully! Score: ${evaluationScore}`, 'success');
+        showToast(`Evaluation submitted successfully! Score: ${evaluationScore}. Performance: ${performanceMetric.value.toFixed(2)}ms`, 'success');
         // Reset form
         setEvaluationScore(0);
         setFeedback('');
@@ -144,7 +114,10 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
         showToast(`Evaluation failed: ${response.error}`, 'error');
       }
     } catch (error) {
+      stopMeasurement();
+
       showToast('An error occurred during evaluation', 'error');
+
     } finally {
       setIsEvaluating(false);
     }
@@ -165,7 +138,11 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
         </select>
       </div>
       <div style={{ marginTop: '15px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-        <Button onClick={handleOptimize} disabled={!promptId}>Run Optimization</Button>
+
+        <Button onClick={handleOptimize} disabled={!promptId || isOptimizing}>
+          {isOptimizing ? 'Optimizing...' : 'Run Optimization'}
+        </Button>
+        {isOptimizing && <LoadingSpinner size="small" inline />}
         <label style={{ fontSize: '0.9em', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
           <input 
             type="checkbox" 
@@ -174,11 +151,7 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
           />
           Performance Mode
         </label>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <Button onClick={handleOptimize} disabled={!promptId || isOptimizing}>
-          {isOptimizing ? 'Optimizing...' : 'Run Optimization'}
-        </Button>
-        {isOptimizing && <LoadingSpinner size="small" inline />}
+
       </div>
       <p style={{ fontSize: '0.9em', color: '#666', marginTop: '10px' }}>
         Leverages an additional language model to generate or refine the original prompt, or employs mathematical principles for precise enhancements. (Section 2.3)
