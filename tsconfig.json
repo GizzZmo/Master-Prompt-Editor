@@ -13,6 +13,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
 
     /* Linting */
     "strict": true,
@@ -20,9 +22,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*", "vite.config.ts"],
-  "references": [
-    { "path": "./src/types" },
-    { "path": "./server" }
-  ]
+  "include": ["src/**/*", "vite.config.ts", "vite-env.d.ts"],
+  "exclude": ["node_modules", "dist", "src/types/dist"]
 }

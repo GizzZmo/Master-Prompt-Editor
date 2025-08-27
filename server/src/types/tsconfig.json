@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "esnext",
+    "module": "commonjs",
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": ".",
     "composite": true,
     "declaration": true,
     "declarationMap": true,
@@ -11,10 +11,8 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "jsx": "react-jsx",
-    "moduleResolution": "bundler"
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["./*.ts"],
+  "include": ["./**/*"],
   "exclude": ["dist", "node_modules"]
 }

@@ -2,8 +2,11 @@ import { useState } from 'react';
 import Button from '../../../components/ui/Button';
 import { optimizePrompt, evaluatePrompt } from '../../../utils/api';
 import { PromptEvaluationResult, PromptOptimizationStrategyType } from '../../../types/prompt';
+import PerformanceBenchmark from './PerformanceBenchmark';
+import { performanceTester } from '../../../utils/performance';
 import { useToast } from '../../../context/toastContextHelpers';
 import LoadingSpinner from '../../../components/ui/LoadingSpinner';
+
 
 interface PromptOptimizationSettingsProps {
   promptId: string;
@@ -14,28 +17,43 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
   const [evaluationMetric, setEvaluationMetric] = useState<string>('accuracy');
   const [evaluationScore, setEvaluationScore] = useState<number>(0);
   const [feedback, setFeedback] = useState<string>('');
+  const [performanceMode, setPerformanceMode] = useState<boolean>(false);
+
   const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
   const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
   const { showToast } = useToast();
+
 
   const handleOptimize = async () => {
     if (!promptId) {
       showToast('Please select or create a prompt first.', 'warning');
       return;
     }
+
     
     setIsOptimizing(true);
+    console.log(`Optimizing prompt ${promptId} using ${optimizationStrategy}...`);
+    
+    // Measure optimization performance
+    const stopMeasurement = performanceTester.startMeasurement(
+      `optimization_${promptId}`,
+      `Prompt Optimization - ${optimizationStrategy}`
+    );
+
     try {
-      console.log(`Optimizing prompt ${promptId} using ${optimizationStrategy}...`);
-      // TODO: Call API to trigger optimization (2.3)
       const response = await optimizePrompt(promptId, optimizationStrategy);
+      const performanceMetric = stopMeasurement();
+      
       if (response.success) {
-        showToast(`Optimization completed successfully using ${optimizationStrategy}!`, 'success');
+        showToast(`Optimization completed successfully using ${optimizationStrategy}! Performance: ${performanceMetric.value.toFixed(2)}ms`, 'success');
       } else {
         showToast(`Optimization failed: ${response.error}`, 'error');
       }
     } catch (error) {
+      stopMeasurement();
+
       showToast('An error occurred during optimization', 'error');
+
     } finally {
       setIsOptimizing(false);
     }
@@ -46,27 +64,49 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       showToast('Please select or create a prompt first.', 'warning');
       return;
     }
-    
+
     if (!evaluationMetric || evaluationScore < 0 || evaluationScore > 100) {
       showToast('Please provide a valid metric and score (0-100)', 'warning');
       return;
     }
     
     setIsEvaluating(true);
+
+    // Measure evaluation performance
+    const stopMeasurement = performanceTester.startMeasurement(
+      `evaluation_${promptId}`,
+      `Prompt Evaluation - ${evaluationMetric}`
+    );
+
     try {
       const evaluationResult: PromptEvaluationResult = {
         promptId,
-        version: 'current', // In a real scenario, this would be the actual version
+        version: 'current',
         metric: evaluationMetric,
         score: evaluationScore,
+        reasoning: `Manual evaluation with score ${evaluationScore}`,
         feedback: feedback,
         timestamp: new Date().toISOString(),
+        performanceMetrics: {
+          responseTime: 0, // Will be updated after API call
+          tokenUsage: { input: 0, output: 0, total: 0 },
+          cost: 0,
+          latency: 0
+        }
       };
+
       console.log(`Evaluating prompt ${promptId} with score ${evaluationScore}...`);
-      // TODO: Call API to submit evaluation (2.3)
       const response = await evaluatePrompt(promptId, evaluationResult);
+      const performanceMetric = stopMeasurement();
+
+      // Update performance metrics
+      if (evaluationResult.performanceMetrics) {
+        evaluationResult.performanceMetrics.responseTime = performanceMetric.value;
+        evaluationResult.performanceMetrics.latency = performanceMetric.value;
+      }
+
       if (response.success) {
-        showToast(`Evaluation submitted successfully! Score: ${evaluationScore}`, 'success');
+        showToast(`Evaluation submitted successfully! Score: ${evaluationScore}. Performance: ${performanceMetric.value.toFixed(2)}ms`, 'success');
         // Reset form
         setEvaluationScore(0);
         setFeedback('');
@@ -74,7 +114,10 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
         showToast(`Evaluation failed: ${response.error}`, 'error');
       }
     } catch (error) {
+      stopMeasurement();
+
       showToast('An error occurred during evaluation', 'error');
+
     } finally {
       setIsEvaluating(false);
     }
@@ -89,13 +132,26 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
           <option value="meta-prompting">Meta-prompting (AI refines prompt)</option>
           <option value="gradient-based">Gradient-based Optimization</option>
           <option value="dspy">DSPy Integration (Automated techniques)</option>
+          <option value="chain-of-thought">Chain-of-Thought Prompting</option>
+          <option value="few-shot">Few-shot Learning</option>
+          <option value="zero-shot">Zero-shot Learning</option>
         </select>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ marginTop: '15px', display: 'flex', gap: '10px', alignItems: 'center' }}>
+
         <Button onClick={handleOptimize} disabled={!promptId || isOptimizing}>
           {isOptimizing ? 'Optimizing...' : 'Run Optimization'}
         </Button>
         {isOptimizing && <LoadingSpinner size="small" inline />}
+        <label style={{ fontSize: '0.9em', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <input 
+            type="checkbox" 
+            checked={performanceMode} 
+            onChange={(e) => setPerformanceMode(e.target.checked)}
+          />
+          Performance Mode
+        </label>
+
       </div>
       <p style={{ fontSize: '0.9em', color: '#666', marginTop: '10px' }}>
         Leverages an additional language model to generate or refine the original prompt, or employs mathematical principles for precise enhancements. (Section 2.3)
@@ -123,6 +179,9 @@ const PromptOptimizationSettings: React.FC<PromptOptimizationSettingsProps> = ({
       <p style={{ fontSize: '0.9em', color: '#666', marginTop: '10px' }}>
         Comprehensive evaluation metrics, leveraging built-in evaluation flows to assess prompt quality and effectiveness. (Section 2.3)
       </p>
+
+      {/* Performance Benchmarking Section */}
+      {performanceMode && <PerformanceBenchmark promptId={promptId} />}
     </div>
   );
 };
