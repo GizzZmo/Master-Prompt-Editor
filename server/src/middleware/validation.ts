@@ -192,8 +192,8 @@ export const sanitizeAndValidateRequest = (req: Request, res: Response, next: Ne
     if (typeof value === 'string') {
       // Remove null bytes, control characters, and suspicious patterns
       // Create regex for control characters dynamically to avoid linting issues
-      const controlChars = String.fromCharCode(...Array.from({length: 32}, (_, i) => i)) + String.fromCharCode(127);
-      const controlCharsRegex = new RegExp('[' + controlChars.replace(/[[\]\\-]/g, '\\$&') + ']', 'g');
+      // Use a standard regex for ASCII control characters and DEL
+      const controlCharsRegex = /[\x00-\x1F\x7F]/g;
       
       return value
         .replace(controlCharsRegex, '') // Remove control characters
