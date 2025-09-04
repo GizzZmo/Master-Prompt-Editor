@@ -12,7 +12,7 @@ Master Prompt Editor is a React/TypeScript monorepo implementing an AI Orchestra
 - **NEVER CANCEL any build command** - All builds must complete fully
 - Frontend build: Takes ~2-3 seconds. Set timeout to 120+ seconds minimum
 - Full build (all components): Takes ~6-7 seconds. Set timeout to 300+ seconds minimum  
-- Dependency installation: Takes ~20 seconds. Set timeout to 180+ seconds minimum
+- Dependency installation: Takes ~10 seconds. Set timeout to 180+ seconds minimum
 - Linting: Takes ~2 seconds. Set timeout to 60+ seconds minimum
 
 ### Build Dependencies and Order
@@ -29,7 +29,7 @@ This step is REQUIRED before any server build operations.
 npm run install:all
 ```
 - Installs root, server, and client dependencies simultaneously
-- Takes approximately 20 seconds
+- Takes approximately 10 seconds
 - NEVER CANCEL - wait for completion
 
 ### Build All Components
@@ -71,6 +71,7 @@ npm run lint:all
 - Takes ~2 seconds
 - May show warnings but should not fail builds
 - NEVER CANCEL - Set timeout to 60+ seconds
+- **Expected warnings** (acceptable): deprecated packages, TypeScript version compatibility
 
 ## Validation Requirements
 
@@ -83,7 +84,7 @@ After making changes, ALWAYS validate by:
    ```
 
 2. **Navigate and test core functionality**:
-   - Visit http://localhost:3000/public/index.html
+   - Visit http://localhost:3000 or http://localhost:3000/public/index.html
    - Click "Master Prompt Editor" - should navigate to prompt editor page
    - Click "Advanced AI Toolkit" - should navigate to AI toolkit page  
    - Click "Dashboard" - should return to main dashboard
@@ -99,6 +100,11 @@ After making changes, ALWAYS validate by:
 4. **Test keyboard shortcuts**:
    - Press Ctrl+/ to verify shortcuts panel appears
 
+5. **Test production build** (optional):
+   ```bash
+   npm run preview  # Starts preview server on port 4173
+   ```
+
 ### Pre-Commit Validation
 ALWAYS run these commands before committing:
 ```bash
@@ -113,6 +119,13 @@ npm run lint:all
 
 # Start frontend and test navigation manually
 npm run dev:frontend
+```
+
+### Security Testing (Optional)
+For comprehensive security validation, refer to `SECURITY_TESTING_GUIDE.md`:
+```bash
+# Test rate limiting, input validation, CORS, security headers
+# See SECURITY_TESTING_GUIDE.md for detailed security test procedures
 ```
 
 ## Repository Structure
@@ -196,9 +209,41 @@ The GitHub Actions workflow (`.github/workflows/ci.yml`):
 
 - **No test suite currently exists** - validation is manual through running the application
 - **Environment variables**: Use `VITE_` prefix for frontend, standard names for backend
-- **Port configuration**: Frontend (3000), Backend (3001), Client (8080)
+- **Port configuration**: Frontend (3000), Backend (3001), Client (8080), Preview (4173)
 - **CORS enabled**: Backend allows cross-origin requests for development
 - **Security headers**: CSP and security headers configured in index.html
+
+## Common Commands and Expected Outputs
+
+### Repository Root Structure
+```
+.
+├── .github/             # GitHub workflows and templates
+├── src/                 # Frontend source (React/TypeScript)
+├── server/              # Backend Express server
+├── client/              # Simple HTML/JS client
+├── public/              # Static assets
+├── package.json         # Root dependencies and scripts
+├── README.md            # Project documentation
+├── SECURITY_TESTING_GUIDE.md  # Security validation procedures
+└── vite.config.ts       # Vite build configuration
+```
+
+### Build Artifacts Locations
+After building:
+- Frontend: `dist/` (Vite production build)
+- Server: `server/dist/` (Compiled TypeScript)
+- Client: `client/dist/` (Copied static files)
+- Types: `src/types/dist/` (Compiled shared types)
+
+### Expected API Responses
+```bash
+curl http://localhost:3001/health
+# Returns: {"status":"ok","timestamp":"...","version":"1.0.0"}
+
+curl http://localhost:3001/api/prompts  
+# Returns: []
+```
 
 ---
 
