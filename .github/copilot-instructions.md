@@ -12,7 +12,7 @@ Master Prompt Editor is a React/TypeScript monorepo implementing an AI Orchestra
 - **NEVER CANCEL any build command** - All builds must complete fully
 - Frontend build: Takes ~2-3 seconds. Set timeout to 120+ seconds minimum
 - Full build (all components): Takes ~6-7 seconds. Set timeout to 300+ seconds minimum  
-- Dependency installation: Takes ~20 seconds. Set timeout to 180+ seconds minimum
+- Dependency installation: Takes ~10 seconds. Set timeout to 180+ seconds minimum
 - Linting: Takes ~2 seconds. Set timeout to 60+ seconds minimum
 
 ### Build Dependencies and Order
@@ -29,7 +29,7 @@ This step is REQUIRED before any server build operations.
 npm run install:all
 ```
 - Installs root, server, and client dependencies simultaneously
-- Takes approximately 20 seconds
+- Takes approximately 10 seconds
 - NEVER CANCEL - wait for completion
 
 ### Build All Components
@@ -163,12 +163,31 @@ const API_URL = process.env.REACT_APP_API_URL || '/api';
 - **Shared types not built**: Run `tsc --build src/types` first
 - **Circular dependencies**: Check imports between types and components
 - **Missing types**: Ensure all TypeScript files have proper type annotations
+- **Missing Vite types**: If you see `Property 'env' does not exist on type 'ImportMeta'`, the `vite-env.d.ts` file may be missing from the project root. This file should contain:
+  ```typescript
+  /// <reference types="vite/client" />
+  
+  interface ImportMetaEnv {
+    readonly VITE_API_URL?: string;
+  }
+  
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+  ```
+- **Missing Toast imports**: Components using `showToast` need to import and use the `useToast` hook:
+  ```typescript
+  import { useToast } from '../../../context/toastContextHelpers';
+  const { showToast } = useToast();
+  ```
 
 ### Linting Warnings
-Current known warnings (acceptable):
-- React hooks exhaustive-deps warnings in some components
-- Some @typescript-eslint/no-explicit-any warnings in utility files
-- These do not prevent builds and can be addressed incrementally
+Current known issues (acceptable, do not prevent builds):
+- **TypeScript version warning**: Using TypeScript 5.9.2 which is newer than officially supported by @typescript-eslint
+- **Explicit any usage**: server/src/middleware/auditLogging.ts has intentional `any` type usage
+- **Control character regex**: server/src/middleware/validation.ts uses control character patterns for security filtering
+- **React hooks exhaustive-deps**: Some components have missing dependencies in useCallback arrays
+- These issues are documented and do not prevent successful builds or deployments
 
 ### Runtime Errors
 - **Process not defined**: Use `import.meta.env` instead of `process.env` in frontend code

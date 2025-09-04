@@ -9,6 +9,7 @@ interface PerformanceBenchmarkProps {
 }
 
 const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ promptId }) => {
+  const { showToast } = useToast();
   const [benchmarkResults, setBenchmarkResults] = useState<BenchmarkResult[]>([]);
   const [loadTestResults, setLoadTestResults] = useState<LoadTestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
