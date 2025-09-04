@@ -1,5 +1,6 @@
       - name: Upload frontend artifacts
         uses: actions/upload-artifact@v3
+
         with:
           name: frontend-build
           path: dist/
@@ -7,13 +8,16 @@
 
       - name: Upload server artifacts
         uses: actions/upload-artifact@v3
+
         with:
           name: server-build
           path: server/dist/
           retention-days: 30
 
       - name: Upload client artifacts  
+
         uses: actions/upload-artifact@v3
+
         with:
           name: client-build
           path: client/dist/
@@ -21,6 +25,7 @@
 
       - name: Upload types artifacts
         uses: actions/upload-artifact@v3
+
         with:
           name: types-build
           path: src/types/dist/
