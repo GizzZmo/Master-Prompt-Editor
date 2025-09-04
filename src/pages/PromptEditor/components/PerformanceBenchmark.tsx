@@ -2,12 +2,14 @@ import React, { useState, useCallback } from 'react';
 import Button from '../../../components/ui/Button';
 import { performanceTester, BenchmarkResult, LoadTestResult, LoadTestConfig } from '../../../utils/performance';
 import { PromptOptimizationStrategyType } from '../../../types/prompt';
+import { useToast } from '../../../context/toastContextHelpers';
 
 interface PerformanceBenchmarkProps {
   promptId: string;
 }
 
 const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ promptId }) => {
+  const { showToast } = useToast();
   const [benchmarkResults, setBenchmarkResults] = useState<BenchmarkResult[]>([]);
   const [loadTestResults, setLoadTestResults] = useState<LoadTestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
