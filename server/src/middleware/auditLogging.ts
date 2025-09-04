@@ -122,7 +122,7 @@ export const auditMiddleware = (req: Request, res: Response, next: NextFunction)
   // Simple override without complex type handling
   const originalJson = res.json.bind(res);
   
-  res.json = function(body: any) {
+  res.json = function(body: Record<string, unknown>) {
     const duration = Date.now() - startTime;
     
     // Determine if this is a sensitive operation

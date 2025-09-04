@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Button from '../../../components/ui/Button';
 import { performanceTester, BenchmarkResult, LoadTestResult, LoadTestConfig } from '../../../utils/performance';
 import { PromptOptimizationStrategyType } from '../../../types/prompt';
+import { useToast } from '../../../context/toastContextHelpers';
 
 interface PerformanceBenchmarkProps {
   promptId: string;
@@ -15,6 +16,7 @@ const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ promptId })
   const [iterations, setIterations] = useState(10);
   const [concurrentUsers, setConcurrentUsers] = useState(5);
   const [testDuration, setTestDuration] = useState(30);
+  const { showToast } = useToast();
 
   const runBenchmark = useCallback(async () => {
     if (!promptId) {
@@ -42,7 +44,7 @@ const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ promptId })
     } finally {
       setIsRunning(false);
     }
-  }, [promptId, selectedStrategy, iterations]);
+  }, [promptId, selectedStrategy, iterations, showToast]);
 
   const runLoadTest = useCallback(async () => {
     if (!promptId) {

@@ -1,31 +1,65 @@
-      - name: Upload frontend artifacts
-        uses: actions/upload-artifact@v3
+name: Master-Prompt-Editor CI
 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20.x]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install all dependencies
+        run: npm run install:all
+
+      - name: Build shared types (required first)
+        run: tsc --build src/types
+
+      - name: Build all components
+        run: npm run build:all
+
+      - name: Run linting
+        run: npm run lint:all
+        continue-on-error: true
+
+      - name: Upload frontend artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-build
           path: dist/
           retention-days: 30
 
       - name: Upload server artifacts
-        uses: actions/upload-artifact@v3
-
+        uses: actions/upload-artifact@v4
         with:
           name: server-build
           path: server/dist/
           retention-days: 30
 
       - name: Upload client artifacts  
-
-        uses: actions/upload-artifact@v3
-
+        uses: actions/upload-artifact@v4
         with:
           name: client-build
           path: client/dist/
           retention-days: 30
 
       - name: Upload types artifacts
-        uses: actions/upload-artifact@v3
-
+        uses: actions/upload-artifact@v4
         with:
           name: types-build
           path: src/types/dist/
