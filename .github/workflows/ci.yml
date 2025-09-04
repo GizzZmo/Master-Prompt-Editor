@@ -1,65 +1,31 @@
-name: Master-Prompt-Editor CI
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-jobs:
-  build_and_test:
-    name: Build, Lint & Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
-
-      - name: Set up Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: '20.x'
-          cache: 'npm'
-          cache-dependency-path: |
-            package.json
-            client/package.json
-            server/package.json
-
-      - name: Install all dependencies
-        run: npm run install:all
-
-      - name: Build shared types first
-        run: tsc --build src/types
-        
-      - name: Build all projects  
-        run: npm run build:all
-
-      - name: Lint project
-        run: npm run lint:all
-        continue-on-error: true  # Don't fail CI on linting warnings for now
-
       - name: Upload frontend artifacts
-        uses: actions/upload-artifact@b12e8abb855456ea57bf96d42692c463f0c9892e
+        uses: actions/upload-artifact@v3
+
         with:
           name: frontend-build
           path: dist/
           retention-days: 30
 
       - name: Upload server artifacts
-        uses: actions/upload-artifact@b12e8abb855456ea57bf96d42692c463f0c9892e
+        uses: actions/upload-artifact@v3
+
         with:
           name: server-build
           path: server/dist/
           retention-days: 30
 
       - name: Upload client artifacts  
-        uses: actions/upload-artifact@b12e8abb855456ea57bf96d42692c463f0c9892e
+
+        uses: actions/upload-artifact@v3
+
         with:
           name: client-build
           path: client/dist/
           retention-days: 30
 
       - name: Upload types artifacts
-        uses: actions/upload-artifact@b12e8abb855456ea57bf96d42692c463f0c9892e
+        uses: actions/upload-artifact@v3
+
         with:
           name: types-build
           path: src/types/dist/
