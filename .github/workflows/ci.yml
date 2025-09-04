@@ -33,7 +33,7 @@ jobs:
       - name: Build all components
         run: npm run build:all
 
-      - name: Run linting
+      - name: Run linting (continue on warnings)
         run: npm run lint:all
         continue-on-error: true
 
