@@ -1,65 +1,26 @@
-name: Master-Prompt-Editor CI
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-jobs:
-  build_and_test:
-    name: Build, Lint & Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'npm'
-          cache-dependency-path: |
-            package.json
-            client/package.json
-            server/package.json
-
-      - name: Install all dependencies
-        run: npm run install:all
-
-      - name: Build shared types first
-        run: tsc --build src/types
-        
-      - name: Build all projects  
-        run: npm run build:all
-
-      - name: Lint project
-        run: npm run lint:all
-        continue-on-error: true  # Don't fail CI on linting warnings for now
-
       - name: Upload frontend artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: frontend-build
           path: dist/
           retention-days: 30
 
       - name: Upload server artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: server-build
           path: server/dist/
           retention-days: 30
 
       - name: Upload client artifacts  
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: client-build
           path: client/dist/
           retention-days: 30
 
       - name: Upload types artifacts
-        uses: actions/upload-artifact@v4  
+        uses: actions/upload-artifact@v3
         with:
           name: types-build
           path: src/types/dist/
