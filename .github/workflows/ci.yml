@@ -1,4 +1,4 @@
-name: Master-Prompt-Editor CI
+name: System CI
 
 on:
   push:
@@ -7,13 +7,13 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
+  build-test-lint:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
-        node-version: [20.x]
-    
+        node-version: [20.x] # Change or add more versions as needed
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,43 +24,22 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Install all dependencies
-        run: npm run install:all
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Build shared types (required first)
-        run: tsc --build src/types
+      - name: Build
+        run: npm run build
 
-      - name: Build all components
-        run: npm run build:all
+      - name: Run tests
+        run: npm test
 
-      - name: Run linting (continue on warnings)
-        run: npm run lint:all
+      - name: Lint code
+        run: npm run lint
         continue-on-error: true
 
-      - name: Upload frontend artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-build
+          name: build-artifacts
           path: dist/
-          retention-days: 30
-
-      - name: Upload server artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: server-build
-          path: server/dist/
-          retention-days: 30
-
-      - name: Upload client artifacts  
-        uses: actions/upload-artifact@v4
-        with:
-          name: client-build
-          path: client/dist/
-          retention-days: 30
-
-      - name: Upload types artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: types-build
-          path: src/types/dist/
-          retention-days: 30
+          retention-days: 14
