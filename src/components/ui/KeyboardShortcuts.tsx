@@ -10,6 +10,52 @@ interface KeyboardShortcutsProps {
   shortcuts: KeyboardShortcut[];
 }
 
+// Component for individual keyboard shortcut badge with hover effects
+const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      style={{
+        background: isHovered 
+          ? 'linear-gradient(145deg, #3498db, #2980b9)'
+          : 'linear-gradient(145deg, #2c3e50, #34495e)',
+        padding: '6px 12px',
+        borderRadius: '8px',
+        fontSize: '13px',
+        fontFamily: 'monospace',
+        fontWeight: 'bold',
+        color: '#ffffff',
+        textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)',
+        boxShadow: isHovered
+          ? `
+            0 6px 12px rgba(0, 0, 0, 0.4),
+            0 3px 6px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.4)
+          `
+          : `
+            0 4px 8px rgba(0, 0, 0, 0.3),
+            0 2px 4px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.3)
+          `,
+        border: isHovered ? '1px solid #1e3a8a' : '1px solid #1a252f',
+        transform: isHovered ? 'translateY(-2px)' : 'translateY(-1px)',
+        transition: 'all 0.2s ease',
+        minWidth: 'fit-content',
+        letterSpacing: '0.5px',
+        cursor: 'default',
+        userSelect: 'none',
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {shortcut}
+    </div>
+  );
+};
+
 const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -147,7 +193,7 @@ const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
           width: '90%',
           maxHeight: '80vh',
           overflowY: 'auto',
-          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.1)',
           zIndex: 1001,
         }}
         role="dialog"
@@ -184,19 +230,8 @@ const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
                 borderBottom: index < shortcuts.length - 1 ? '1px solid #f0f0f0' : 'none',
               }}
             >
-              <span style={{ color: '#555' }}>{shortcut.description}</span>
-              <div
-                style={{
-                  backgroundColor: '#f5f5f5',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  fontFamily: 'monospace',
-                  color: '#333',
-                }}
-              >
-                {formatShortcut(shortcut.key)}
-              </div>
+              <span style={{ color: '#2c3e50', fontWeight: '500' }}>{shortcut.description}</span>
+              <ShortcutBadge shortcut={formatShortcut(shortcut.key)} />
             </div>
           ))}
         </div>

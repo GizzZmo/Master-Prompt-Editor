@@ -17,7 +17,6 @@ const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ promptId })
   const [iterations, setIterations] = useState(10);
   const [concurrentUsers, setConcurrentUsers] = useState(5);
   const [testDuration, setTestDuration] = useState(30);
-  const { showToast } = useToast();
 
   const runBenchmark = useCallback(async () => {
     if (!promptId) {
