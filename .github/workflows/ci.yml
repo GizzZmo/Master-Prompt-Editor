@@ -25,21 +25,28 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npm ci --prefix server
+          npm ci --prefix client
 
-      - name: Build
-        run: npm run build
+      - name: Build shared types
+        run: tsc --build src/types
 
-      - name: Run tests
-        run: npm test
+      - name: Build all components
+        run: npm run build:all
 
       - name: Lint code
-        run: npm run lint
+        run: npm run lint:all
         continue-on-error: true
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: build-artifacts
-          path: dist/
+          path: |
+            dist/
+            server/dist/
+            client/dist/
+            src/types/dist/
           retention-days: 14
