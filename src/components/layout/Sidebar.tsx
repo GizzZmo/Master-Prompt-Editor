@@ -16,18 +16,45 @@ const Sidebar: React.FC = () => {
       <nav>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           <li style={{ marginBottom: '10px' }}>
-            <Link to="/" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>Dashboard</Link>
+            <Link to="/" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>
+              <span style={{ marginRight: '8px' }}>🏠</span>Dashboard
+            </Link>
           </li>
           <li style={{ marginBottom: '10px' }}>
-            <Link to="/prompt-editor" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>Master Prompt Editor</Link>
+            <Link to="/prompt-editor" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>
+              <span style={{ marginRight: '8px' }}>✏️</span>Master Prompt Editor
+            </Link>
           </li>
           <li style={{ marginBottom: '10px' }}>
-            <Link to="/ai-toolkit" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>Advanced AI Toolkit</Link>
+            <Link to="/prompt-library" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>
+              <span style={{ marginRight: '8px' }}>📚</span>Prompt Library
+            </Link>
           </li>
           <li style={{ marginBottom: '10px' }}>
-            <Link to="/settings" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>Settings</Link>
+            <Link to="/ai-toolkit" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>
+              <span style={{ marginRight: '8px' }}>🔧</span>Advanced AI Toolkit
+            </Link>
           </li>
-          {/* TODO: Add more navigation links based on 'Swiss Army Knife' functionality */}
+          <li style={{ marginBottom: '10px' }}>
+            <Link to="/model-comparison" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>
+              <span style={{ marginRight: '8px' }}>⚖️</span>Model Comparison
+            </Link>
+          </li>
+          <li style={{ marginBottom: '10px' }}>
+            <Link to="/analytics" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>
+              <span style={{ marginRight: '8px' }}>📊</span>Analytics & Metrics
+            </Link>
+          </li>
+          <li style={{ marginBottom: '10px' }}>
+            <Link to="/settings" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>
+              <span style={{ marginRight: '8px' }}>⚙️</span>Settings
+            </Link>
+          </li>
+          <li style={{ marginBottom: '10px' }}>
+            <Link to="/help" style={{ color: 'white', textDecoration: 'none', padding: '10px 15px', display: 'block', borderRadius: '5px' }}>
+              <span style={{ marginRight: '8px' }}>❓</span>Help & Documentation
+            </Link>
+          </li>
         </ul>
       </nav>
     </aside>
