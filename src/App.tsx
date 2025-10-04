@@ -5,6 +5,10 @@ import DashboardPage from './pages/DashboardPage';
 import { PromptEditorPage } from './pages/PromptEditor/PromptEditorPage';
 import { AIToolkitPage } from './pages/AIToolkit/AIToolkitPage';
 import SettingsPage from './pages/SettingsPage';
+import PromptLibraryPage from './pages/PromptLibraryPage';
+import ModelComparisonPage from './pages/ModelComparisonPage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import HelpPage from './pages/HelpPage';
 import { AIProvider } from './context/AIContext';
 import { ToastProvider } from './context/ToastContext';
 import KeyboardShortcuts from './components/ui/KeyboardShortcuts';
@@ -67,12 +71,31 @@ function AppContent() {
                 <AIToolkitPage />
               </PageErrorBoundary>
             } />
+            <Route path="/prompt-library" element={
+              <PageErrorBoundary pageName="Prompt Library">
+                <PromptLibraryPage />
+              </PageErrorBoundary>
+            } />
+            <Route path="/model-comparison" element={
+              <PageErrorBoundary pageName="Model Comparison">
+                <ModelComparisonPage />
+              </PageErrorBoundary>
+            } />
+            <Route path="/analytics" element={
+              <PageErrorBoundary pageName="Analytics">
+                <AnalyticsPage />
+              </PageErrorBoundary>
+            } />
+            <Route path="/help" element={
+              <PageErrorBoundary pageName="Help">
+                <HelpPage />
+              </PageErrorBoundary>
+            } />
             <Route path="/settings" element={
               <PageErrorBoundary pageName="Settings">
                 <SettingsPage />
               </PageErrorBoundary>
             } />
-            {/* TODO: Add more routes for specific toolkit functionalities */}
           </Routes>
         </div>
       </div>
