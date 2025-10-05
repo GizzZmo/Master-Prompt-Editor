@@ -1,103 +1,122 @@
 import React, { useState } from 'react';
 import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
 import { useToast } from '../context/toastContextHelpers';
 
-interface ModelInfo {
+interface AIModel {
   id: string;
   name: string;
   provider: string;
-  description: string;
-  strengths: string[];
   contextWindow: string;
-  costPerMToken: string;
-  speed: 'Fast' | 'Medium' | 'Slow';
-  quality: 'High' | 'Medium' | 'Standard';
+  costPer1kTokens: string;
+  speed: string;
+  quality: string;
+  description: string;
 }
 
-const ModelComparisonPage: React.FC = () => {
-  const { showToast } = useToast();
-  const [testPrompt, setTestPrompt] = useState('');
-  const [selectedModels, setSelectedModels] = useState<string[]>([]);
+const MODELS: AIModel[] = [
+  {
+    id: 'gpt-4',
+    name: 'GPT-4',
+    provider: 'OpenAI',
+    contextWindow: '8K / 32K',
+    costPer1kTokens: '$0.03 / $0.06',
+    speed: 'Medium',
+    quality: 'Excellent',
+    description: 'Most capable GPT-4 model, best for complex tasks requiring high accuracy'
+  },
+  {
+    id: 'gpt-4-turbo',
+    name: 'GPT-4 Turbo',
+    provider: 'OpenAI',
+    contextWindow: '128K',
+    costPer1kTokens: '$0.01 / $0.03',
+    speed: 'Fast',
+    quality: 'Excellent',
+    description: 'Faster and more cost-effective GPT-4 variant with extended context'
+  },
+  {
+    id: 'claude-3-opus',
+    name: 'Claude 3 Opus',
+    provider: 'Anthropic',
+    contextWindow: '200K',
+    costPer1kTokens: '$0.015 / $0.075',
+    speed: 'Medium',
+    quality: 'Excellent',
+    description: 'Most powerful Claude model, excels at complex analysis and creative tasks'
+  },
+  {
+    id: 'claude-3-sonnet',
+    name: 'Claude 3 Sonnet',
+    provider: 'Anthropic',
+    contextWindow: '200K',
+    costPer1kTokens: '$0.003 / $0.015',
+    speed: 'Fast',
+    quality: 'Very Good',
+    description: 'Balanced performance and cost, ideal for most use cases'
+  },
+  {
+    id: 'gemini-pro',
+    name: 'Gemini Pro',
+    provider: 'Google',
+    contextWindow: '32K',
+    costPer1kTokens: '$0.00025 / $0.0005',
+    speed: 'Very Fast',
+    quality: 'Good',
+    description: 'Cost-effective option with good performance for general tasks'
+  },
+  {
+    id: 'llama-3-70b',
+    name: 'Llama 3 70B',
+    provider: 'Meta',
+    contextWindow: '8K',
+    costPer1kTokens: 'Free / Self-hosted',
+    speed: 'Medium',
+    quality: 'Good',
+    description: 'Open-source model, great for self-hosting and customization'
+  },
+  {
+    id: 'mistral-large',
+    name: 'Mistral Large',
+    provider: 'Mistral AI',
+    contextWindow: '32K',
+    costPer1kTokens: '$0.004 / $0.012',
+    speed: 'Fast',
+    quality: 'Very Good',
+    description: 'European alternative with strong multilingual capabilities'
+  },
+  {
+    id: 'gpt-3.5-turbo',
+    name: 'GPT-3.5 Turbo',
+    provider: 'OpenAI',
+    contextWindow: '16K',
+    costPer1kTokens: '$0.0005 / $0.0015',
+    speed: 'Very Fast',
+    quality: 'Good',
+    description: 'Fast and cost-effective for simple tasks and high-volume applications'
+  }
+];
 
-  const models: ModelInfo[] = [
-    {
-      id: 'gpt-4',
-      name: 'GPT-4',
-      provider: 'OpenAI',
-      description: 'Most capable model, best for complex reasoning tasks',
-      strengths: ['Complex reasoning', 'Code generation', 'Long context understanding'],
-      contextWindow: '8K-32K tokens',
-      costPerMToken: '$30-60',
-      speed: 'Medium',
-      quality: 'High'
-    },
-    {
-      id: 'gpt-3.5-turbo',
-      name: 'GPT-3.5 Turbo',
-      provider: 'OpenAI',
-      description: 'Fast and cost-effective for most tasks',
-      strengths: ['Fast responses', 'Cost-effective', 'General purpose'],
-      contextWindow: '4K-16K tokens',
-      costPerMToken: '$0.50-1.50',
-      speed: 'Fast',
-      quality: 'Medium'
-    },
-    {
-      id: 'claude-3-opus',
-      name: 'Claude 3 Opus',
-      provider: 'Anthropic',
-      description: 'Excellent for analysis and long documents',
-      strengths: ['Long context', 'Analysis', 'Nuanced responses'],
-      contextWindow: '200K tokens',
-      costPerMToken: '$15-75',
-      speed: 'Medium',
-      quality: 'High'
-    },
-    {
-      id: 'claude-3-sonnet',
-      name: 'Claude 3 Sonnet',
-      provider: 'Anthropic',
-      description: 'Balanced performance and cost',
-      strengths: ['Balanced', 'Reliable', 'Good reasoning'],
-      contextWindow: '200K tokens',
-      costPerMToken: '$3-15',
-      speed: 'Medium',
-      quality: 'High'
-    },
-    {
-      id: 'llama-3-70b',
-      name: 'Llama 3 70B',
-      provider: 'Meta',
-      description: 'Open-source model for flexible deployment',
-      strengths: ['Open-source', 'Customizable', 'Privacy-focused'],
-      contextWindow: '8K tokens',
-      costPerMToken: 'Self-hosted',
-      speed: 'Medium',
-      quality: 'Medium'
-    },
-    {
-      id: 'gemini-pro',
-      name: 'Gemini Pro',
-      provider: 'Google',
-      description: 'Multimodal capabilities with strong reasoning',
-      strengths: ['Multimodal', 'Fast', 'Good reasoning'],
-      contextWindow: '32K tokens',
-      costPerMToken: '$0.50-1.50',
-      speed: 'Fast',
-      quality: 'High'
-    }
-  ];
+const ModelComparisonPage: React.FC = () => {
+  const [selectedModels, setSelectedModels] = useState<string[]>([]);
+  const [testPrompt, setTestPrompt] = useState('');
+  const [showTestResults, setShowTestResults] = useState(false);
+  const { showToast } = useToast();
 
   const toggleModelSelection = (modelId: string) => {
-    setSelectedModels(prev => 
-      prev.includes(modelId) 
-        ? prev.filter(id => id !== modelId)
-        : [...prev, modelId]
-    );
+    setSelectedModels(prev => {
+      if (prev.includes(modelId)) {
+        return prev.filter(id => id !== modelId);
+      } else {
+        if (prev.length >= 4) {
+          showToast('Maximum 4 models can be compared at once', 'warning');
+          return prev;
+        }
+        return [...prev, modelId];
+      }
+    });
   };
 
-  const handleCompare = () => {
+  const runComparison = () => {
     if (selectedModels.length < 2) {
       showToast('Please select at least 2 models to compare', 'warning');
       return;
@@ -106,153 +125,150 @@ const ModelComparisonPage: React.FC = () => {
       showToast('Please enter a test prompt', 'warning');
       return;
     }
-    showToast(`Comparing ${selectedModels.length} models (conceptual)`, 'info');
+    setShowTestResults(true);
+    showToast('Comparison started! (Mock results)', 'info');
   };
 
-  const getSpeedColor = (speed: string) => {
-    switch(speed) {
-      case 'Fast': return '#28a745';
-      case 'Medium': return '#ffc107';
-      case 'Slow': return '#dc3545';
-      default: return '#666';
-    }
-  };
-
-  const getQualityColor = (quality: string) => {
-    switch(quality) {
-      case 'High': return '#28a745';
-      case 'Medium': return '#ffc107';
-      case 'Standard': return '#6c757d';
-      default: return '#666';
-    }
-  };
+  const selectedModelData = MODELS.filter(m => selectedModels.includes(m.id));
 
   return (
     <div>
-      <h2>Model Comparison</h2>
-      <p>Compare different AI models to choose the best one for your use case.</p>
+      <h2>🔍 Model Comparison</h2>
+      <p>Compare AI models side-by-side to find the best fit for your needs</p>
 
-      <div style={{ 
-        border: '1px solid #e9ecef', 
-        padding: '20px', 
-        borderRadius: '8px', 
-        backgroundColor: 'white',
-        marginBottom: '20px'
-      }}>
-        <h3>Test Prompt (Optional)</h3>
-        <p style={{ fontSize: '0.9em', color: '#666' }}>
-          Enter a prompt to test with selected models and compare their responses.
-        </p>
-        <Input
-          label="Test Prompt:"
-          value={testPrompt}
-          onChange={(e) => setTestPrompt(e.target.value)}
-          placeholder="Enter a prompt to test across models..."
-        />
-        <div style={{ marginTop: '10px' }}>
-          <Button 
-            onClick={handleCompare}
-            disabled={selectedModels.length < 2}
-          >
-            Compare Selected Models ({selectedModels.length})
-          </Button>
+      {/* Model Selection */}
+      <div style={{ marginTop: '30px' }}>
+        <h3>Select Models to Compare (up to 4)</h3>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: '15px',
+          marginTop: '15px'
+        }}>
+          {MODELS.map(model => (
+            <div
+              key={model.id}
+              onClick={() => toggleModelSelection(model.id)}
+              style={{
+                border: selectedModels.includes(model.id) ? '2px solid #007bff' : '1px solid #dee2e6',
+                borderRadius: '8px',
+                padding: '15px',
+                cursor: 'pointer',
+                backgroundColor: selectedModels.includes(model.id) ? '#e7f3ff' : 'white',
+                transition: 'all 0.2s'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                <div>
+                  <h4 style={{ margin: '0 0 5px 0', fontSize: '16px' }}>{model.name}</h4>
+                  <p style={{ margin: '0', fontSize: '13px', color: '#6c757d' }}>{model.provider}</p>
+                </div>
+                {selectedModels.includes(model.id) && (
+                  <span style={{ color: '#007bff', fontSize: '20px' }}>✓</span>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', 
-        gap: '20px' 
-      }}>
-        {models.map(model => (
-          <div 
-            key={model.id}
-            style={{ 
-              border: selectedModels.includes(model.id) ? '2px solid #007bff' : '1px solid #e9ecef',
-              padding: '20px', 
-              borderRadius: '8px', 
-              backgroundColor: selectedModels.includes(model.id) ? '#f0f8ff' : 'white',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-            onClick={() => toggleModelSelection(model.id)}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <h3 style={{ margin: 0, color: '#007bff' }}>{model.name}</h3>
-                <p style={{ 
-                  margin: '5px 0', 
-                  fontSize: '0.85em', 
-                  color: '#666',
-                  fontWeight: 'bold'
-                }}>
-                  {model.provider}
-                </p>
-              </div>
-              <input 
-                type="checkbox" 
-                checked={selectedModels.includes(model.id)}
-                onChange={() => toggleModelSelection(model.id)}
-                style={{ width: '20px', height: '20px' }}
-              />
-            </div>
-
-            <p style={{ margin: '10px 0', fontSize: '0.9em' }}>{model.description}</p>
-
-            <div style={{ marginTop: '15px' }}>
-              <p style={{ fontWeight: 'bold', marginBottom: '5px', fontSize: '0.9em' }}>Strengths:</p>
-              <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.85em' }}>
-                {model.strengths.map((strength, idx) => (
-                  <li key={idx}>{strength}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div style={{ 
-              marginTop: '15px', 
-              paddingTop: '15px', 
-              borderTop: '1px solid #e9ecef',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '10px',
-              fontSize: '0.85em'
-            }}>
-              <div>
-                <strong>Context:</strong>
-                <div>{model.contextWindow}</div>
-              </div>
-              <div>
-                <strong>Cost:</strong>
-                <div>{model.costPerMToken}</div>
-              </div>
-              <div>
-                <strong>Speed:</strong>
-                <div style={{ color: getSpeedColor(model.speed) }}>
-                  ● {model.speed}
-                </div>
-              </div>
-              <div>
-                <strong>Quality:</strong>
-                <div style={{ color: getQualityColor(model.quality) }}>
-                  ● {model.quality}
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
+      {/* Comparison Table */}
       {selectedModels.length > 0 && (
-        <div style={{ 
-          marginTop: '30px', 
-          padding: '20px', 
-          backgroundColor: '#f8f9fa', 
-          borderRadius: '8px' 
-        }}>
-          <h3>Selected Models ({selectedModels.length})</h3>
-          <p style={{ fontSize: '0.9em' }}>
-            {selectedModels.map(id => models.find(m => m.id === id)?.name).join(', ')}
-          </p>
+        <div style={{ marginTop: '30px', overflowX: 'auto' }}>
+          <h3>Comparison ({selectedModels.length} models selected)</h3>
+          <table style={{ 
+            width: '100%', 
+            borderCollapse: 'collapse',
+            marginTop: '15px',
+            backgroundColor: 'white',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f8f9fa' }}>
+                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Feature</th>
+                {selectedModelData.map(model => (
+                  <th key={model.id} style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>
+                    {model.name}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{ padding: '12px', fontWeight: '500', borderBottom: '1px solid #dee2e6' }}>Provider</td>
+                {selectedModelData.map(model => (
+                  <td key={model.id} style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{model.provider}</td>
+                ))}
+              </tr>
+              <tr style={{ backgroundColor: '#f8f9fa' }}>
+                <td style={{ padding: '12px', fontWeight: '500', borderBottom: '1px solid #dee2e6' }}>Context Window</td>
+                {selectedModelData.map(model => (
+                  <td key={model.id} style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{model.contextWindow}</td>
+                ))}
+              </tr>
+              <tr>
+                <td style={{ padding: '12px', fontWeight: '500', borderBottom: '1px solid #dee2e6' }}>Cost per 1K Tokens</td>
+                {selectedModelData.map(model => (
+                  <td key={model.id} style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{model.costPer1kTokens}</td>
+                ))}
+              </tr>
+              <tr style={{ backgroundColor: '#f8f9fa' }}>
+                <td style={{ padding: '12px', fontWeight: '500', borderBottom: '1px solid #dee2e6' }}>Speed</td>
+                {selectedModelData.map(model => (
+                  <td key={model.id} style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{model.speed}</td>
+                ))}
+              </tr>
+              <tr>
+                <td style={{ padding: '12px', fontWeight: '500', borderBottom: '1px solid #dee2e6' }}>Quality</td>
+                {selectedModelData.map(model => (
+                  <td key={model.id} style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{model.quality}</td>
+                ))}
+              </tr>
+              <tr style={{ backgroundColor: '#f8f9fa' }}>
+                <td style={{ padding: '12px', fontWeight: '500' }}>Description</td>
+                {selectedModelData.map(model => (
+                  <td key={model.id} style={{ padding: '12px', fontSize: '13px', color: '#6c757d' }}>{model.description}</td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Test Prompt Section */}
+      {selectedModels.length >= 2 && (
+        <div style={{ marginTop: '30px' }}>
+          <h3>Test with Prompt (Optional)</h3>
+          <textarea
+            value={testPrompt}
+            onChange={(e) => setTestPrompt(e.target.value)}
+            placeholder="Enter a test prompt to compare responses..."
+            style={{
+              width: '100%',
+              minHeight: '100px',
+              padding: '12px',
+              borderRadius: '4px',
+              border: '1px solid #dee2e6',
+              fontSize: '14px',
+              fontFamily: 'inherit',
+              resize: 'vertical'
+            }}
+          />
+          <Button
+            onClick={runComparison}
+            variant="primary"
+            style={{ marginTop: '10px' }}
+          >
+            🚀 Run Comparison
+          </Button>
+
+          {showTestResults && (
+            <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#fff3cd', borderRadius: '4px' }}>
+              <p style={{ margin: 0, color: '#856404' }}>
+                ℹ️ Test comparison feature coming soon! This will send your prompt to selected models and compare their responses.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

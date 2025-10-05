@@ -3,7 +3,11 @@ import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
 import DashboardPage from './pages/DashboardPage';
 import { PromptEditorPage } from './pages/PromptEditor/PromptEditorPage';
+import PromptLibraryPage from './pages/PromptLibraryPage';
 import { AIToolkitPage } from './pages/AIToolkit/AIToolkitPage';
+import ModelComparisonPage from './pages/ModelComparisonPage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import HelpPage from './pages/HelpPage';
 import SettingsPage from './pages/SettingsPage';
 import PromptLibraryPage from './pages/PromptLibraryPage';
 import ModelComparisonPage from './pages/ModelComparisonPage';
@@ -66,14 +70,14 @@ function AppContent() {
                 <PromptEditorPage />
               </PageErrorBoundary>
             } />
-            <Route path="/ai-toolkit" element={
-              <PageErrorBoundary pageName="AI Toolkit">
-                <AIToolkitPage />
-              </PageErrorBoundary>
-            } />
             <Route path="/prompt-library" element={
               <PageErrorBoundary pageName="Prompt Library">
                 <PromptLibraryPage />
+              </PageErrorBoundary>
+            } />
+            <Route path="/ai-toolkit" element={
+              <PageErrorBoundary pageName="AI Toolkit">
+                <AIToolkitPage />
               </PageErrorBoundary>
             } />
             <Route path="/model-comparison" element={

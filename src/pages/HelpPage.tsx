@@ -1,341 +1,299 @@
 import React, { useState } from 'react';
 
-interface FAQItem {
+interface FAQ {
+  id: string;
+  category: string;
   question: string;
   answer: string;
-  category: string;
 }
+
+const FAQS: FAQ[] = [
+  {
+    id: '1',
+    category: 'Getting Started',
+    question: 'How do I create my first prompt?',
+    answer: 'Navigate to the Master Prompt Editor, click "New Prompt", enter your prompt text, and save it. You can then test it in the integrated playground on the right side of the editor.'
+  },
+  {
+    id: '2',
+    category: 'Getting Started',
+    question: 'What is prompt versioning?',
+    answer: 'Prompt versioning allows you to track changes to your prompts over time. Each time you save a modified prompt, a new version is created. You can view, compare, and restore previous versions at any time.'
+  },
+  {
+    id: '3',
+    category: 'Features',
+    question: 'How do I use the AI Toolkit?',
+    answer: 'The Advanced AI Toolkit provides workflow automation, multimodal capabilities, and AI agent management. Navigate to the AI Toolkit page and select the tool you want to use. Each tool has built-in documentation and examples.'
+  },
+  {
+    id: '4',
+    category: 'Features',
+    question: 'Can I compare different AI models?',
+    answer: 'Yes! Go to the Model Comparison page, select up to 4 models you want to compare, and view their specifications side-by-side. You can also test them with a custom prompt to see how each model responds.'
+  },
+  {
+    id: '5',
+    category: 'Optimization',
+    question: 'What optimization strategies are available?',
+    answer: 'We support multiple optimization strategies including meta-prompting, gradient-based optimization, DSPy integration, chain-of-thought, few-shot, and zero-shot learning. Each strategy is designed for different use cases.'
+  },
+  {
+    id: '6',
+    category: 'Optimization',
+    question: 'How does prompt benchmarking work?',
+    answer: 'Benchmarking runs your prompt multiple times to measure performance metrics like response time, consistency, and quality. You can configure the number of iterations and analyze the results to identify optimization opportunities.'
+  },
+  {
+    id: '7',
+    category: 'Analytics',
+    question: 'What metrics are tracked?',
+    answer: 'We track comprehensive metrics including total prompts executed, average response time, success rate, API costs, model usage, and system performance. You can view these metrics on the Analytics page with customizable time ranges.'
+  },
+  {
+    id: '8',
+    category: 'Analytics',
+    question: 'How can I monitor my API costs?',
+    answer: 'The Analytics page provides detailed cost tracking across different time periods. You can see total costs, cost per model, and trends over time. Set up alerts for budget thresholds in the Settings page.'
+  },
+  {
+    id: '9',
+    category: 'Troubleshooting',
+    question: 'Why is my prompt taking too long to respond?',
+    answer: 'Long response times can be caused by several factors: large context windows, complex prompts, or API rate limiting. Try simplifying your prompt, reducing the context size, or switching to a faster model. Check the Analytics page for performance insights.'
+  },
+  {
+    id: '10',
+    category: 'Troubleshooting',
+    question: 'What should I do if I get an error?',
+    answer: 'First, check the error message for details. Common issues include API key problems, rate limits, or network connectivity. Verify your API keys in Settings, check your usage limits, and ensure you have a stable internet connection. Contact support if the issue persists.'
+  },
+  {
+    id: '11',
+    category: 'Best Practices',
+    question: 'How do I write effective prompts?',
+    answer: 'Effective prompts are clear, specific, and well-structured. Use the Prompt Library for templates, provide context and examples, specify the desired format, and iterate based on results. The optimization tools can help refine your prompts automatically.'
+  },
+  {
+    id: '12',
+    category: 'Best Practices',
+    question: 'When should I use which AI model?',
+    answer: 'Choose models based on your needs: GPT-4 for complex reasoning, Claude for long documents, GPT-3.5 Turbo for speed and cost efficiency, and Gemini for multilingual tasks. Use the Model Comparison page to evaluate options for your specific use case.'
+  }
+];
+
+const CATEGORIES = ['All', 'Getting Started', 'Features', 'Optimization', 'Analytics', 'Troubleshooting', 'Best Practices'];
 
 const HelpPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
 
-  const faqs: FAQItem[] = [
-    {
-      question: 'How do I create a new prompt?',
-      answer: 'Navigate to the Master Prompt Editor page, click "Create New Prompt", enter your prompt content, add metadata like tags and description, then save. You can also use templates from the Prompt Library for faster creation.',
-      category: 'Prompts'
-    },
-    {
-      question: 'What are prompt versions and how do I use them?',
-      answer: 'Prompt versions allow you to maintain a history of changes to your prompts. Each time you save changes, a new version is created. You can view version history, compare versions, and rollback to previous versions if needed.',
-      category: 'Prompts'
-    },
-    {
-      question: 'How do I compare different AI models?',
-      answer: 'Visit the Model Comparison page, select the models you want to compare, optionally enter a test prompt, and click "Compare". You\'ll see side-by-side comparisons of capabilities, pricing, and performance characteristics.',
-      category: 'Models'
-    },
-    {
-      question: 'What is a workflow and how do I create one?',
-      answer: 'A workflow is a sequence of AI tasks that can be automated. In the AI Toolkit, use the Workflow Builder to add steps, configure each step\'s parameters, and chain them together. Workflows can include text generation, image processing, data analysis, and more.',
-      category: 'Workflows'
-    },
-    {
-      question: 'How can I track my API usage and costs?',
-      answer: 'The Analytics page provides detailed metrics on API usage, costs, response times, and success rates. You can filter by time range and see breakdowns by model and task type.',
-      category: 'Analytics'
-    },
-    {
-      question: 'What keyboard shortcuts are available?',
-      answer: 'Press Ctrl+/ to view all keyboard shortcuts. Common shortcuts include: Ctrl+S (save prompt), Ctrl+N (new prompt), Ctrl+E (execute workflow), and Escape (close modals).',
-      category: 'General'
-    },
-    {
-      question: 'How do I configure API keys for different AI providers?',
-      answer: 'Go to Settings page and enter your API keys for OpenAI, Anthropic, or other providers. Keys are stored securely and used to authenticate API requests.',
-      category: 'Settings'
-    },
-    {
-      question: 'What are the responsible AI features?',
-      answer: 'The platform includes Explainable AI (XAI) for transparency, bias detection and mitigation tools, data privacy compliance settings (GDPR, CCPA), and clear labeling of AI-generated content.',
-      category: 'Responsible AI'
-    },
-    {
-      question: 'How do I export and import prompts?',
-      answer: 'In the Prompt Editor, use the Export/Import buttons to save prompts as JSON files or import existing prompt collections. This is useful for backup, sharing, or migrating between environments.',
-      category: 'Prompts'
-    },
-    {
-      question: 'What multimodal capabilities are supported?',
-      answer: 'The AI Toolkit supports text, image, audio, and video processing. You can chain different modalities together in workflows, such as generating images from text descriptions or analyzing video content.',
-      category: 'AI Toolkit'
-    }
-  ];
-
-  const categories = ['all', ...Array.from(new Set(faqs.map(f => f.category)))];
-
-  const filteredFAQs = faqs.filter(faq => {
-    const matchesCategory = selectedCategory === 'all' || faq.category === selectedCategory;
+  const filteredFAQs = FAQS.filter(faq => {
+    const matchesCategory = selectedCategory === 'All' || faq.category === selectedCategory;
     const matchesSearch = searchQuery === '' || 
       faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
       faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  const quickStartSteps = [
-    {
-      title: '1. Set Up API Keys',
-      description: 'Configure your AI provider API keys in Settings',
-      icon: '🔑'
-    },
-    {
-      title: '2. Explore Templates',
-      description: 'Browse the Prompt Library for ready-to-use templates',
-      icon: '📚'
-    },
-    {
-      title: '3. Create Your First Prompt',
-      description: 'Use the Master Prompt Editor to create and test prompts',
-      icon: '✏️'
-    },
-    {
-      title: '4. Build a Workflow',
-      description: 'Chain AI tasks together in the AI Toolkit',
-      icon: '🔗'
-    },
-    {
-      title: '5. Monitor Performance',
-      description: 'Track usage and costs in the Analytics dashboard',
-      icon: '📊'
-    }
-  ];
-
-  const resources = [
-    {
-      title: 'Prompt Engineering Guide',
-      description: 'Learn best practices for crafting effective prompts',
-      link: '#'
-    },
-    {
-      title: 'API Documentation',
-      description: 'Technical reference for backend APIs',
-      link: '#'
-    },
-    {
-      title: 'Video Tutorials',
-      description: 'Step-by-step video guides for common tasks',
-      link: '#'
-    },
-    {
-      title: 'Community Forum',
-      description: 'Get help and share knowledge with other users',
-      link: '#'
-    }
-  ];
+  const toggleFAQ = (id: string) => {
+    setExpandedFAQ(expandedFAQ === id ? null : id);
+  };
 
   return (
     <div>
-      <h2>Help & Documentation</h2>
-      <p>Find answers to common questions and learn how to use the AI Orchestrator.</p>
+      <h2>❓ Help & Documentation</h2>
+      <p>Find answers to common questions and learn how to use the AI Orchestrator</p>
 
       {/* Quick Start Guide */}
-      <div style={{ 
-        border: '1px solid #e9ecef', 
-        padding: '20px', 
-        borderRadius: '8px', 
+      <div style={{
         backgroundColor: 'white',
-        marginBottom: '30px'
+        padding: '20px',
+        borderRadius: '8px',
+        border: '1px solid #e9ecef',
+        marginTop: '20px',
+        marginBottom: '30px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
       }}>
-        <h3 style={{ marginTop: 0 }}>Quick Start Guide</h3>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-          gap: '15px' 
-        }}>
-          {quickStartSteps.map((step, idx) => (
-            <div 
-              key={idx}
-              style={{ 
-                padding: '15px',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '8px',
-                textAlign: 'center'
-              }}
-            >
-              <div style={{ fontSize: '2em', marginBottom: '10px' }}>{step.icon}</div>
-              <div style={{ fontWeight: 'bold', marginBottom: '5px', fontSize: '0.9em' }}>
-                {step.title}
-              </div>
-              <div style={{ fontSize: '0.85em', color: '#666' }}>
-                {step.description}
-              </div>
-            </div>
-          ))}
-        </div>
+        <h3 style={{ marginTop: 0, color: '#007bff' }}>🚀 Quick Start Guide</h3>
+        <ol style={{ paddingLeft: '20px', lineHeight: '1.8' }}>
+          <li>
+            <strong>Set up your API keys:</strong> Navigate to Settings and configure your API keys for OpenAI, Anthropic, or other providers.
+          </li>
+          <li>
+            <strong>Create your first prompt:</strong> Go to the Master Prompt Editor and create a new prompt. Use the Prompt Library for templates.
+          </li>
+          <li>
+            <strong>Test your prompt:</strong> Use the built-in playground to test your prompt with different models and parameters.
+          </li>
+          <li>
+            <strong>Optimize and iterate:</strong> Use the optimization tools to improve your prompt&apos;s performance and effectiveness.
+          </li>
+          <li>
+            <strong>Monitor performance:</strong> Check the Analytics page to track usage, costs, and performance metrics.
+          </li>
+        </ol>
       </div>
 
       {/* Search and Filter */}
       <div style={{ marginBottom: '20px' }}>
-        <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-          <input
-            type="text"
-            placeholder="Search questions..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              flex: 1,
-              padding: '10px',
-              borderRadius: '4px',
-              border: '1px solid #ccc',
-              fontSize: '14px'
-            }}
-          />
-          <select 
-            value={selectedCategory} 
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            style={{ 
-              padding: '10px 15px', 
-              borderRadius: '4px', 
-              border: '1px solid #ccc',
-              fontSize: '14px'
-            }}
-          >
-            {categories.map(cat => (
-              <option key={cat} value={cat}>
-                {cat === 'all' ? 'All Categories' : cat}
-              </option>
-            ))}
-          </select>
+        <input
+          type="text"
+          placeholder="🔍 Search FAQs..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '12px',
+            fontSize: '14px',
+            border: '1px solid #dee2e6',
+            borderRadius: '4px',
+            marginBottom: '15px'
+          }}
+        />
+
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          {CATEGORIES.map(category => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: selectedCategory === category ? '#007bff' : '#f8f9fa',
+                color: selectedCategory === category ? 'white' : '#212529',
+                border: '1px solid #dee2e6',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: selectedCategory === category ? '600' : '400'
+              }}
+            >
+              {category}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* FAQs */}
-      <div style={{ 
-        border: '1px solid #e9ecef', 
-        padding: '20px', 
-        borderRadius: '8px', 
+      {/* FAQ List */}
+      <div style={{
         backgroundColor: 'white',
-        marginBottom: '30px'
+        borderRadius: '8px',
+        border: '1px solid #e9ecef',
+        overflow: 'hidden',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
       }}>
-        <h3 style={{ marginTop: 0 }}>Frequently Asked Questions</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {filteredFAQs.map((faq, idx) => (
-            <div 
-              key={idx}
-              style={{ 
-                border: '1px solid #e9ecef',
-                borderRadius: '4px',
-                overflow: 'hidden'
+        {filteredFAQs.length > 0 ? (
+          filteredFAQs.map((faq, index) => (
+            <div
+              key={faq.id}
+              style={{
+                borderBottom: index < filteredFAQs.length - 1 ? '1px solid #e9ecef' : 'none'
               }}
             >
-              <div 
-                onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
-                style={{ 
-                  padding: '15px',
-                  backgroundColor: expandedFAQ === idx ? '#f8f9fa' : 'white',
+              <button
+                onClick={() => toggleFAQ(faq.id)}
+                style={{
+                  width: '100%',
+                  padding: '16px 20px',
+                  backgroundColor: expandedFAQ === faq.id ? '#f8f9fa' : 'white',
+                  border: 'none',
+                  textAlign: 'left',
                   cursor: 'pointer',
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  transition: 'background-color 0.2s'
                 }}
               >
                 <div>
-                  <span style={{ 
-                    fontSize: '0.75em', 
-                    color: '#666',
-                    backgroundColor: '#e9ecef',
+                  <div style={{
+                    display: 'inline-block',
                     padding: '2px 8px',
+                    backgroundColor: '#e7f3ff',
+                    color: '#0066cc',
                     borderRadius: '4px',
-                    marginRight: '10px'
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    marginBottom: '8px'
                   }}>
                     {faq.category}
-                  </span>
-                  <span style={{ fontWeight: 'bold' }}>{faq.question}</span>
+                  </div>
+                  <div style={{ fontSize: '15px', fontWeight: '500', color: '#212529' }}>
+                    {faq.question}
+                  </div>
                 </div>
-                <span style={{ fontSize: '1.5em', color: '#666' }}>
-                  {expandedFAQ === idx ? '−' : '+'}
+                <span style={{ 
+                  fontSize: '20px', 
+                  color: '#6c757d',
+                  transition: 'transform 0.2s',
+                  transform: expandedFAQ === faq.id ? 'rotate(180deg)' : 'rotate(0deg)',
+                  display: 'inline-block'
+                }}>
+                  ▼
                 </span>
-              </div>
-              {expandedFAQ === idx && (
-                <div style={{ 
-                  padding: '15px',
+              </button>
+              {expandedFAQ === faq.id && (
+                <div style={{
+                  padding: '16px 20px',
                   backgroundColor: '#f8f9fa',
-                  borderTop: '1px solid #e9ecef'
+                  fontSize: '14px',
+                  lineHeight: '1.6',
+                  color: '#495057'
                 }}>
                   {faq.answer}
                 </div>
               )}
             </div>
-          ))}
-        </div>
-        {filteredFAQs.length === 0 && (
-          <p style={{ textAlign: 'center', color: '#666', margin: '20px 0' }}>
-            No FAQs found matching your search.
-          </p>
+          ))
+        ) : (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#6c757d' }}>
+            <p>No FAQs found matching your search.</p>
+          </div>
         )}
       </div>
 
-      {/* Resources */}
-      <div style={{ 
-        border: '1px solid #e9ecef', 
-        padding: '20px', 
-        borderRadius: '8px', 
-        backgroundColor: 'white'
+      {/* Additional Resources */}
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        border: '1px solid #e9ecef',
+        marginTop: '30px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
       }}>
-        <h3 style={{ marginTop: 0 }}>Additional Resources</h3>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-          gap: '15px' 
-        }}>
-          {resources.map((resource, idx) => (
-            <a
-              key={idx}
-              href={resource.link}
-              style={{
-                padding: '15px',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '8px',
-                textDecoration: 'none',
-                color: 'inherit',
-                border: '1px solid #e9ecef',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#e9ecef';
-                e.currentTarget.style.borderColor = '#007bff';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#f8f9fa';
-                e.currentTarget.style.borderColor = '#e9ecef';
-              }}
-            >
-              <div style={{ fontWeight: 'bold', marginBottom: '5px', color: '#007bff' }}>
-                {resource.title}
-              </div>
-              <div style={{ fontSize: '0.85em', color: '#666' }}>
-                {resource.description}
-              </div>
-            </a>
-          ))}
-        </div>
+        <h3 style={{ marginTop: 0 }}>📚 Additional Resources</h3>
+        <ul style={{ lineHeight: '2', paddingLeft: '20px' }}>
+          <li><a href="#" style={{ color: '#007bff', textDecoration: 'none' }}>📖 Complete Documentation</a></li>
+          <li><a href="#" style={{ color: '#007bff', textDecoration: 'none' }}>🎥 Video Tutorials</a></li>
+          <li><a href="#" style={{ color: '#007bff', textDecoration: 'none' }}>💡 Best Practices Guide</a></li>
+          <li><a href="#" style={{ color: '#007bff', textDecoration: 'none' }}>🔧 API Reference</a></li>
+          <li><a href="#" style={{ color: '#007bff', textDecoration: 'none' }}>👥 Community Forum</a></li>
+        </ul>
       </div>
 
-      <div style={{ 
-        marginTop: '30px', 
-        padding: '20px', 
-        backgroundColor: '#f0f8ff', 
+      {/* Contact Support */}
+      <div style={{
+        backgroundColor: '#007bff',
+        color: 'white',
+        padding: '30px',
         borderRadius: '8px',
+        marginTop: '30px',
         textAlign: 'center'
       }}>
-        <h3 style={{ marginTop: 0 }}>Still Need Help?</h3>
-        <p style={{ marginBottom: '15px' }}>
-          Can&apos;t find what you&apos;re looking for? Our support team is here to help.
-        </p>
-        <button 
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            fontSize: '14px',
-            cursor: 'pointer'
-          }}
-        >
-          Contact Support
+        <h3 style={{ marginTop: 0, marginBottom: '10px' }}>Need More Help?</h3>
+        <p style={{ marginBottom: '20px' }}>Our support team is here to help you succeed</p>
+        <button style={{
+          padding: '12px 24px',
+          backgroundColor: 'white',
+          color: '#007bff',
+          border: 'none',
+          borderRadius: '4px',
+          fontSize: '16px',
+          fontWeight: '600',
+          cursor: 'pointer'
+        }}>
+          📧 Contact Support
         </button>
       </div>
     </div>

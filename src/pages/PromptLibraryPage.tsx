@@ -4,178 +4,194 @@ import { useToast } from '../context/toastContextHelpers';
 
 interface PromptTemplate {
   id: string;
-  name: string;
+  title: string;
   description: string;
   category: string;
   template: string;
-  tags: string[];
 }
 
+const TEMPLATES: PromptTemplate[] = [
+  {
+    id: '1',
+    title: 'Content Summarization',
+    description: 'Summarize long-form content into concise bullet points',
+    category: 'Content',
+    template: 'Please summarize the following content into key bullet points:\n\n{content}\n\nProvide a concise summary highlighting the main points and key takeaways.'
+  },
+  {
+    id: '2',
+    title: 'Code Review',
+    description: 'Comprehensive code review focusing on best practices',
+    category: 'Development',
+    template: 'Review the following code for:\n1. Code quality and best practices\n2. Potential bugs or security issues\n3. Performance optimizations\n4. Code readability and maintainability\n\n{code}\n\nProvide specific feedback and suggestions for improvement.'
+  },
+  {
+    id: '3',
+    title: 'Marketing Copy',
+    description: 'Generate compelling marketing copy for products',
+    category: 'Marketing',
+    template: 'Create engaging marketing copy for the following product:\n\nProduct: {product_name}\nKey Features: {features}\nTarget Audience: {audience}\n\nGenerate:\n1. Catchy headline\n2. Product description\n3. Call-to-action'
+  },
+  {
+    id: '4',
+    title: 'Data Analysis',
+    description: 'Analyze data patterns and generate insights',
+    category: 'Analytics',
+    template: 'Analyze the following data and provide insights:\n\n{data}\n\nProvide:\n1. Key patterns and trends\n2. Statistical summary\n3. Actionable recommendations\n4. Potential anomalies or outliers'
+  },
+  {
+    id: '5',
+    title: 'Technical Documentation',
+    description: 'Create clear and comprehensive technical documentation',
+    category: 'Documentation',
+    template: 'Create technical documentation for:\n\nFeature/Component: {name}\nPurpose: {purpose}\nTechnical Details: {details}\n\nInclude:\n1. Overview and purpose\n2. Usage instructions\n3. API/Interface documentation\n4. Examples and best practices\n5. Troubleshooting tips'
+  },
+  {
+    id: '6',
+    title: 'Customer Support Response',
+    description: 'Generate helpful and empathetic customer support responses',
+    category: 'Support',
+    template: 'Draft a customer support response for:\n\nCustomer Issue: {issue}\nCustomer Sentiment: {sentiment}\nContext: {context}\n\nProvide:\n1. Empathetic acknowledgment\n2. Clear explanation or solution\n3. Step-by-step instructions if applicable\n4. Follow-up action items'
+  },
+  {
+    id: '7',
+    title: 'Blog Post Outline',
+    description: 'Create structured blog post outlines',
+    category: 'Content',
+    template: 'Create a blog post outline for:\n\nTopic: {topic}\nTarget Audience: {audience}\nKey Points: {key_points}\n\nGenerate:\n1. Attention-grabbing title\n2. Introduction hook\n3. Main sections with subheadings\n4. Conclusion with call-to-action'
+  },
+  {
+    id: '8',
+    title: 'Bug Report Analysis',
+    description: 'Analyze and categorize bug reports',
+    category: 'Development',
+    template: 'Analyze this bug report:\n\n{bug_report}\n\nProvide:\n1. Severity classification (Critical/High/Medium/Low)\n2. Root cause analysis\n3. Affected components\n4. Recommended steps to reproduce\n5. Suggested fix or workaround'
+  }
+];
+
+const CATEGORIES = ['All', 'Content', 'Development', 'Marketing', 'Analytics', 'Documentation', 'Support'];
+
 const PromptLibraryPage: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const { showToast } = useToast();
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // Mock prompt templates
-  const templates: PromptTemplate[] = [
-    {
-      id: '1',
-      name: 'Content Summarization',
-      description: 'Summarize long-form content into concise summaries',
-      category: 'Text Processing',
-      template: 'Summarize the following text in [number] sentences, focusing on the main points:\n\n[text]',
-      tags: ['summarization', 'text', 'nlp']
-    },
-    {
-      id: '2',
-      name: 'Code Review Assistant',
-      description: 'Review code for best practices and potential issues',
-      category: 'Development',
-      template: 'Review the following code and provide feedback on:\n1. Code quality\n2. Potential bugs\n3. Performance optimizations\n4. Best practices\n\n```[language]\n[code]\n```',
-      tags: ['code', 'review', 'development']
-    },
-    {
-      id: '3',
-      name: 'Marketing Copy Generator',
-      description: 'Generate compelling marketing copy for products',
-      category: 'Marketing',
-      template: 'Create engaging marketing copy for [product] that:\n- Highlights key benefits\n- Targets [audience]\n- Uses a [tone] tone\n- Includes a strong call-to-action',
-      tags: ['marketing', 'copywriting', 'content']
-    },
-    {
-      id: '4',
-      name: 'Data Analysis Query',
-      description: 'Analyze datasets and extract insights',
-      category: 'Analytics',
-      template: 'Analyze the following data and provide:\n1. Key trends and patterns\n2. Notable outliers\n3. Actionable insights\n4. Recommendations\n\nData: [data]',
-      tags: ['analytics', 'data', 'insights']
-    },
-    {
-      id: '5',
-      name: 'Technical Documentation',
-      description: 'Generate clear technical documentation',
-      category: 'Development',
-      template: 'Create technical documentation for [component/feature] including:\n- Overview and purpose\n- Setup instructions\n- API reference\n- Usage examples\n- Common issues and troubleshooting',
-      tags: ['documentation', 'technical', 'development']
-    },
-    {
-      id: '6',
-      name: 'Customer Support Response',
-      description: 'Draft professional customer support responses',
-      category: 'Customer Service',
-      template: 'Draft a professional customer support response for the following inquiry:\n\nCustomer Issue: [issue]\n\nInclude:\n- Acknowledgment of the issue\n- Clear solution or next steps\n- Professional and empathetic tone',
-      tags: ['support', 'customer-service', 'communication']
-    }
-  ];
+  const filteredTemplates = selectedCategory === 'All' 
+    ? TEMPLATES 
+    : TEMPLATES.filter(t => t.category === selectedCategory);
 
-  const categories = ['all', ...Array.from(new Set(templates.map(t => t.category)))];
-
-  const filteredTemplates = selectedCategory === 'all' 
-    ? templates 
-    : templates.filter(t => t.category === selectedCategory);
-
-  const handleUseTemplate = (template: PromptTemplate) => {
-    showToast(`Template "${template.name}" copied to clipboard!`, 'success');
-    navigator.clipboard.writeText(template.template);
+  const copyToClipboard = (template: string) => {
+    navigator.clipboard.writeText(template).then(() => {
+      showToast('Template copied to clipboard!', 'success');
+    }).catch(() => {
+      showToast('Failed to copy template', 'error');
+    });
   };
 
   return (
     <div>
-      <h2>Prompt Library</h2>
-      <p>Browse and use pre-built prompt templates to accelerate your AI workflows.</p>
+      <h2>📚 Prompt Library</h2>
+      <p>Browse and use pre-built prompt templates for common tasks</p>
 
-      <div style={{ marginTop: '20px', marginBottom: '20px' }}>
-        <label style={{ marginRight: '10px', fontWeight: 'bold' }}>Filter by Category:</label>
-        <select 
-          value={selectedCategory} 
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          style={{ 
-            padding: '8px 12px', 
-            borderRadius: '4px', 
-            border: '1px solid #ccc',
-            fontSize: '14px'
-          }}
-        >
-          {categories.map(cat => (
-            <option key={cat} value={cat}>
-              {cat === 'all' ? 'All Categories' : cat}
-            </option>
-          ))}
-        </select>
+      {/* Category Filter */}
+      <div style={{ 
+        marginTop: '20px', 
+        marginBottom: '20px',
+        display: 'flex',
+        gap: '10px',
+        flexWrap: 'wrap'
+      }}>
+        {CATEGORIES.map(category => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: selectedCategory === category ? '#007bff' : '#f8f9fa',
+              color: selectedCategory === category ? 'white' : '#212529',
+              border: '1px solid #dee2e6',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: selectedCategory === category ? '600' : '400',
+              transition: 'all 0.2s'
+            }}
+          >
+            {category}
+          </button>
+        ))}
       </div>
 
+      {/* Templates Grid */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', 
-        gap: '20px' 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+        gap: '20px',
+        marginTop: '20px'
       }}>
         {filteredTemplates.map(template => (
           <div 
             key={template.id}
-            style={{ 
-              border: '1px solid #e9ecef', 
-              padding: '20px', 
-              borderRadius: '8px', 
+            style={{
+              border: '1px solid #e9ecef',
+              borderRadius: '8px',
+              padding: '20px',
               backgroundColor: 'white',
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px'
+              transition: 'box-shadow 0.2s',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
             }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'}
           >
-            <h3 style={{ margin: 0, color: '#007bff' }}>{template.name}</h3>
-            <p style={{ 
-              margin: 0, 
-              fontSize: '0.9em', 
-              color: '#666',
-              backgroundColor: '#f8f9fa',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              display: 'inline-block',
-              alignSelf: 'flex-start'
-            }}>
-              {template.category}
+            <div style={{ marginBottom: '10px' }}>
+              <span style={{
+                display: 'inline-block',
+                padding: '4px 12px',
+                backgroundColor: '#e7f3ff',
+                color: '#0066cc',
+                borderRadius: '12px',
+                fontSize: '12px',
+                fontWeight: '500',
+                marginBottom: '10px'
+              }}>
+                {template.category}
+              </span>
+            </div>
+            <h3 style={{ marginTop: '0', marginBottom: '10px', fontSize: '18px' }}>
+              {template.title}
+            </h3>
+            <p style={{ color: '#6c757d', fontSize: '14px', marginBottom: '15px', flexGrow: 1 }}>
+              {template.description}
             </p>
-            <p style={{ margin: 0, flexGrow: 1 }}>{template.description}</p>
-            
-            <div style={{ 
-              backgroundColor: '#f8f9fa', 
-              padding: '10px', 
+            <div style={{
+              backgroundColor: '#f8f9fa',
+              padding: '12px',
               borderRadius: '4px',
-              fontSize: '0.85em',
+              marginBottom: '15px',
+              fontSize: '13px',
               fontFamily: 'monospace',
               maxHeight: '100px',
-              overflowY: 'auto'
+              overflowY: 'auto',
+              color: '#495057'
             }}>
-              {template.template}
+              {template.template.substring(0, 150)}...
             </div>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '5px' }}>
-              {template.tags.map(tag => (
-                <span 
-                  key={tag}
-                  style={{
-                    fontSize: '0.75em',
-                    padding: '2px 8px',
-                    backgroundColor: '#e9ecef',
-                    borderRadius: '12px',
-                    color: '#495057'
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            <Button onClick={() => handleUseTemplate(template)}>
-              Use Template
+            <Button
+              onClick={() => copyToClipboard(template.template)}
+              variant="primary"
+              style={{ width: '100%' }}
+            >
+              📋 Copy to Clipboard
             </Button>
           </div>
         ))}
       </div>
 
       {filteredTemplates.length === 0 && (
-        <p style={{ textAlign: 'center', color: '#666', marginTop: '40px' }}>
-          No templates found in this category.
-        </p>
+        <div style={{ textAlign: 'center', padding: '40px', color: '#6c757d' }}>
+          <p>No templates found in this category.</p>
+        </div>
       )}
     </div>
   );

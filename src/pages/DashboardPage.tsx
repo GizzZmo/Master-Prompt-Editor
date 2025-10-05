@@ -1,202 +1,284 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from '../components/ui/Button';
 
 const DashboardPage: React.FC = () => {
-  const quickActions = [
-    { label: 'Create New Prompt', icon: '✏️', link: '/prompt-editor', color: '#007bff' },
-    { label: 'Browse Templates', icon: '📚', link: '/prompt-library', color: '#28a745' },
-    { label: 'Build Workflow', icon: '🔗', link: '/ai-toolkit', color: '#6f42c1' },
-    { label: 'Compare Models', icon: '⚖️', link: '/model-comparison', color: '#fd7e14' },
-    { label: 'View Analytics', icon: '📊', link: '/analytics', color: '#20c997' },
-    { label: 'Get Help', icon: '❓', link: '/help', color: '#17a2b8' }
+  // Mock metrics - would come from API in production
+  const metrics = {
+    successRate: 96.8,
+    avgResponse: 2.3,
+    totalRuns: 1247,
+    monthlyCost: 142.50
+  };
+
+  const toolkitUsage = [
+    { name: 'Prompt Editor', usage: 85 },
+    { name: 'Workflow Automation', usage: 62 },
+    { name: 'Model Testing', usage: 48 },
+    { name: 'Data Analysis', usage: 35 }
+  ];
+
+  const recentActivities = [
+    { id: '1', icon: '✅', message: 'Prompt optimization completed', time: '2 min ago', status: 'success' },
+    { id: '2', icon: '✅', message: 'Code review workflow executed', time: '15 min ago', status: 'success' },
+    { id: '3', icon: '⚠️', message: 'High latency detected (3.8s)', time: '1 hour ago', status: 'warning' },
+    { id: '4', icon: '✅', message: 'Batch processing completed', time: '2 hours ago', status: 'success' },
+    { id: '5', icon: '❌', message: 'API rate limit reached', time: '3 hours ago', status: 'error' }
+  ];
+
+  const systemHealth = [
+    { component: 'API Gateway', status: 'operational', icon: '🟢' },
+    { component: 'Database', status: 'operational', icon: '🟢' },
+    { component: 'AI Models', status: 'operational', icon: '🟢' },
+    { component: 'Cache', status: 'degraded', icon: '🟡' }
   ];
 
   return (
     <div>
-      <h2>Dashboard</h2>
-      <p>Welcome to the AI Orchestrator! This dashboard provides an overview of your AI activities, prompt performance, and system health.</p>
-      
-      {/* Quick Actions */}
-      <div style={{ 
-        border: '1px solid #e9ecef', 
-        padding: '20px', 
-        borderRadius: '8px', 
+      <h2>🏠 Dashboard</h2>
+      <p>Welcome to the AI Orchestrator! Monitor your AI activities, performance metrics, and system health.</p>
+
+      {/* Quick Actions Widget */}
+      <div style={{
         backgroundColor: 'white',
-        marginBottom: '20px'
+        padding: '20px',
+        borderRadius: '8px',
+        border: '1px solid #e9ecef',
+        marginTop: '20px',
+        marginBottom: '30px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
       }}>
-        <h3 style={{ marginTop: 0 }}>Quick Actions</h3>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
-          gap: '15px' 
-        }}>
-          {quickActions.map((action, idx) => (
-            <Link
-              key={idx}
-              to={action.link}
-              style={{
-                textDecoration: 'none',
-                color: 'inherit'
-              }}
+        <h3 style={{ marginTop: 0, marginBottom: '15px' }}>⚡ Quick Actions</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
+          <Link to="/prompt-editor" style={{ textDecoration: 'none' }}>
+            <div style={{
+              padding: '15px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              border: '1px solid #e9ecef'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e9ecef'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
             >
-              <div
-                style={{
-                  padding: '15px',
-                  backgroundColor: '#f8f9fa',
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  border: '2px solid transparent',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = action.color;
-                  e.currentTarget.style.backgroundColor = '#e9ecef';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'transparent';
-                  e.currentTarget.style.backgroundColor = '#f8f9fa';
-                }}
-              >
-                <div style={{ fontSize: '2em', marginBottom: '8px' }}>{action.icon}</div>
-                <div style={{ fontSize: '0.9em', fontWeight: 'bold' }}>{action.label}</div>
-              </div>
-            </Link>
-          ))}
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>📝</div>
+              <div style={{ fontWeight: '600', color: '#212529' }}>Create Prompt</div>
+            </div>
+          </Link>
+          <Link to="/prompt-library" style={{ textDecoration: 'none' }}>
+            <div style={{
+              padding: '15px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              border: '1px solid #e9ecef'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e9ecef'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+            >
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>📚</div>
+              <div style={{ fontWeight: '600', color: '#212529' }}>Browse Templates</div>
+            </div>
+          </Link>
+          <Link to="/model-comparison" style={{ textDecoration: 'none' }}>
+            <div style={{
+              padding: '15px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              border: '1px solid #e9ecef'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e9ecef'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+            >
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>🔍</div>
+              <div style={{ fontWeight: '600', color: '#212529' }}>Compare Models</div>
+            </div>
+          </Link>
+          <Link to="/analytics" style={{ textDecoration: 'none' }}>
+            <div style={{
+              padding: '15px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              border: '1px solid #e9ecef'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e9ecef'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+            >
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>📊</div>
+              <div style={{ fontWeight: '600', color: '#212529' }}>View Analytics</div>
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      {/* Real Metrics Display */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '20px',
+        marginBottom: '30px'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #e9ecef',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '8px' }}>Success Rate</div>
+          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#28a745' }}>{metrics.successRate}%</div>
+          <div style={{ fontSize: '12px', color: '#28a745', marginTop: '4px' }}>↑ 2.3% improvement</div>
+        </div>
+
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #e9ecef',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '8px' }}>Avg Response</div>
+          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#007bff' }}>{metrics.avgResponse}s</div>
+          <div style={{ fontSize: '12px', color: '#28a745', marginTop: '4px' }}>↓ 8% faster</div>
+        </div>
+
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #e9ecef',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '8px' }}>Total Runs</div>
+          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#212529' }}>{metrics.totalRuns.toLocaleString()}</div>
+          <div style={{ fontSize: '12px', color: '#28a745', marginTop: '4px' }}>↑ 12% this week</div>
+        </div>
+
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #e9ecef',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '8px' }}>Monthly Cost</div>
+          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#212529' }}>${metrics.monthlyCost}</div>
+          <div style={{ fontSize: '12px', color: '#dc3545', marginTop: '4px' }}>↑ 5% from last month</div>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '20px' }}>
-        <div style={{ border: '1px solid #e9ecef', padding: '20px', borderRadius: '8px', backgroundColor: 'white' }}>
-          <h3>Prompt Performance Overview</h3>
-          <p>Key metrics like successful prompt runs, error rates, and cost analysis.</p>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '1fr 1fr', 
-            gap: '15px',
-            marginTop: '15px'
-          }}>
-            <div style={{ textAlign: 'center', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-              <div style={{ fontSize: '2em', fontWeight: 'bold', color: '#28a745' }}>98.7%</div>
-              <div style={{ fontSize: '0.85em', color: '#666' }}>Success Rate</div>
+        {/* Toolkit Usage with Progress Bars */}
+        <div style={{ border: '1px solid #e9ecef', padding: '20px', borderRadius: '8px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <h3 style={{ marginTop: 0 }}>🛠️ Toolkit Usage</h3>
+          {toolkitUsage.map((tool, index) => (
+            <div key={index} style={{ marginBottom: '15px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                <span style={{ fontSize: '14px', fontWeight: '500' }}>{tool.name}</span>
+                <span style={{ fontSize: '14px', color: '#6c757d' }}>{tool.usage}%</span>
+              </div>
+              <div style={{
+                width: '100%',
+                height: '8px',
+                backgroundColor: '#e9ecef',
+                borderRadius: '4px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: `${tool.usage}%`,
+                  height: '100%',
+                  backgroundColor: '#007bff',
+                  borderRadius: '4px',
+                  transition: 'width 0.3s ease'
+                }} />
+              </div>
             </div>
-            <div style={{ textAlign: 'center', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-              <div style={{ fontSize: '2em', fontWeight: 'bold', color: '#007bff' }}>1.2s</div>
-              <div style={{ fontSize: '0.85em', color: '#666' }}>Avg Response</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-              <div style={{ fontSize: '2em', fontWeight: 'bold', color: '#6f42c1' }}>2,847</div>
-              <div style={{ fontSize: '0.85em', color: '#666' }}>Total Runs</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-              <div style={{ fontSize: '2em', fontWeight: 'bold', color: '#fd7e14' }}>$247</div>
-              <div style={{ fontSize: '0.85em', color: '#666' }}>Monthly Cost</div>
-            </div>
-          </div>
-          <Link to="/analytics" style={{ textDecoration: 'none', display: 'block', marginTop: '15px' }}>
-            <Button>View Detailed Analytics →</Button>
-          </Link>
+          ))}
         </div>
-        <div style={{ border: '1px solid #e9ecef', padding: '20px', borderRadius: '8px', backgroundColor: 'white' }}>
-          <h3>AI Toolkit Usage</h3>
-          <p>Insights into multimodal AI tasks, workflow automation usage, and model utilization.</p>
-          <div style={{ marginTop: '15px' }}>
-            <div style={{ marginBottom: '15px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                <span style={{ fontSize: '0.9em' }}>Active Workflows</span>
-                <span style={{ fontWeight: 'bold' }}>34</span>
+
+        {/* Enhanced Recent Activities */}
+        <div style={{ border: '1px solid #e9ecef', padding: '20px', borderRadius: '8px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <h3 style={{ marginTop: 0 }}>📋 Recent Activities</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {recentActivities.map(activity => (
+              <div
+                key={activity.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'start',
+                  padding: '10px',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '6px',
+                  fontSize: '14px'
+                }}
+              >
+                <span style={{ fontSize: '18px', marginRight: '10px' }}>{activity.icon}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: '#212529', marginBottom: '2px' }}>{activity.message}</div>
+                  <div style={{ fontSize: '12px', color: '#6c757d' }}>{activity.time}</div>
+                </div>
               </div>
-              <div style={{ height: '8px', backgroundColor: '#e9ecef', borderRadius: '4px' }}>
-                <div style={{ width: '75%', height: '100%', backgroundColor: '#007bff', borderRadius: '4px' }} />
-              </div>
-            </div>
-            <div style={{ marginBottom: '15px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                <span style={{ fontSize: '0.9em' }}>Model Usage</span>
-                <span style={{ fontWeight: 'bold' }}>High</span>
-              </div>
-              <div style={{ height: '8px', backgroundColor: '#e9ecef', borderRadius: '4px' }}>
-                <div style={{ width: '85%', height: '100%', backgroundColor: '#28a745', borderRadius: '4px' }} />
-              </div>
-            </div>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                <span style={{ fontSize: '0.9em' }}>Resource Consumption</span>
-                <span style={{ fontWeight: 'bold' }}>Moderate</span>
-              </div>
-              <div style={{ height: '8px', backgroundColor: '#e9ecef', borderRadius: '4px' }}>
-                <div style={{ width: '60%', height: '100%', backgroundColor: '#ffc107', borderRadius: '4px' }} />
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-        <div style={{ border: '1px solid #e9ecef', padding: '20px', borderRadius: '8px', backgroundColor: 'white' }}>
-          <h3>Recent Activities</h3>
-          <p>Latest prompt updates, workflow runs, and system alerts.</p>
-          <ul style={{ fontSize: '0.9em', lineHeight: '1.8' }}>
-            <li>
-              <span style={{ color: '#28a745', marginRight: '5px' }}>✓</span>
-              Prompt &apos;marketing-campaign-v1.2.0&apos; updated.
-              <div style={{ fontSize: '0.8em', color: '#666' }}>2 minutes ago</div>
-            </li>
-            <li>
-              <span style={{ color: '#28a745', marginRight: '5px' }}>✓</span>
-              Workflow &apos;CustomerOnboarding&apos; executed successfully.
-              <div style={{ fontSize: '0.8em', color: '#666' }}>15 minutes ago</div>
-            </li>
-            <li>
-              <span style={{ color: '#ffc107', marginRight: '5px' }}>⚠</span>
-              Alert: High latency detected on image generation task.
-              <div style={{ fontSize: '0.8em', color: '#666' }}>1 hour ago</div>
-            </li>
-          </ul>
+
+        {/* System Health Monitoring */}
+        <div style={{ border: '1px solid #e9ecef', padding: '20px', borderRadius: '8px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <h3 style={{ marginTop: 0 }}>💚 System Health</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {systemHealth.map((component, index) => (
+              <div
+                key={index}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '10px',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '6px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '18px' }}>{component.icon}</span>
+                  <span style={{ fontSize: '14px', fontWeight: '500' }}>{component.component}</span>
+                </div>
+                <span style={{
+                  fontSize: '12px',
+                  padding: '4px 10px',
+                  borderRadius: '12px',
+                  backgroundColor: component.status === 'operational' ? '#d4edda' : '#fff3cd',
+                  color: component.status === 'operational' ? '#155724' : '#856404'
+                }}>
+                  {component.status}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-        <div style={{ border: '1px solid #e9ecef', padding: '20px', borderRadius: '8px', backgroundColor: 'white' }}>
-          <h3>System Health</h3>
-          <p>Monitoring overall system performance, stability, and uptime.</p>
-          <div style={{ marginTop: '15px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
-              <div style={{ 
-                width: '12px', 
-                height: '12px', 
-                backgroundColor: '#28a745', 
-                borderRadius: '50%',
-                marginRight: '10px'
-              }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '0.9em', fontWeight: 'bold' }}>API Services</div>
-                <div style={{ fontSize: '0.8em', color: '#666' }}>All systems operational</div>
-              </div>
-              <div style={{ fontSize: '0.9em', color: '#28a745', fontWeight: 'bold' }}>99.9%</div>
+
+        {/* Performance Overview */}
+        <div style={{ border: '1px solid #e9ecef', padding: '20px', borderRadius: '8px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <h3 style={{ marginTop: 0 }}>📈 Performance Overview</h3>
+          <p style={{ fontSize: '14px', color: '#6c757d', marginBottom: '15px' }}>
+            Key metrics tracking prompt execution, response times, and cost analysis
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+              <span style={{ fontSize: '14px' }}>Avg. Tokens/Request</span>
+              <span style={{ fontSize: '14px', fontWeight: '600' }}>1,250</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
-              <div style={{ 
-                width: '12px', 
-                height: '12px', 
-                backgroundColor: '#28a745', 
-                borderRadius: '50%',
-                marginRight: '10px'
-              }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '0.9em', fontWeight: 'bold' }}>Database</div>
-                <div style={{ fontSize: '0.8em', color: '#666' }}>Response time: 45ms</div>
-              </div>
-              <div style={{ fontSize: '0.9em', color: '#28a745', fontWeight: 'bold' }}>Healthy</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+              <span style={{ fontSize: '14px' }}>Peak Load Time</span>
+              <span style={{ fontSize: '14px', fontWeight: '600' }}>14:00-16:00</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ 
-                width: '12px', 
-                height: '12px', 
-                backgroundColor: '#ffc107', 
-                borderRadius: '50%',
-                marginRight: '10px'
-              }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '0.9em', fontWeight: 'bold' }}>Cache Layer</div>
-                <div style={{ fontSize: '0.8em', color: '#666' }}>High memory usage</div>
-              </div>
-              <div style={{ fontSize: '0.9em', color: '#ffc107', fontWeight: 'bold' }}>Warning</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+              <span style={{ fontSize: '14px' }}>Error Rate</span>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: '#28a745' }}>3.2%</span>
             </div>
           </div>
         </div>

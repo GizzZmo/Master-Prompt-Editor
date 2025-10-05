@@ -1,94 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
-interface MetricCard {
-  title: string;
-  value: string;
-  change: string;
-  trend: 'up' | 'down' | 'neutral';
-  description: string;
+type TimeRange = '24h' | '7d' | '30d' | '90d';
+
+interface ActivityLog {
+  id: string;
+  type: 'success' | 'warning' | 'error';
+  message: string;
+  timestamp: string;
+  model?: string;
+}
+
+interface ModelUsage {
+  name: string;
+  usage: number;
+  percentage: number;
 }
 
 const AnalyticsPage: React.FC = () => {
-  const [timeRange, setTimeRange] = useState<string>('7d');
+  const [timeRange, setTimeRange] = useState<TimeRange>('7d');
 
-  const metrics: MetricCard[] = [
-    {
-      title: 'Total Prompts Executed',
-      value: '2,847',
-      change: '+12.5%',
-      trend: 'up',
-      description: 'Compared to previous period'
-    },
-    {
-      title: 'Average Response Time',
-      value: '1.2s',
-      change: '-8.3%',
-      trend: 'up',
-      description: 'Faster than previous period'
-    },
-    {
-      title: 'Success Rate',
-      value: '98.7%',
-      change: '+2.1%',
-      trend: 'up',
-      description: 'Error rate decreased'
-    },
-    {
-      title: 'Total API Cost',
-      value: '$247.50',
-      change: '+15.2%',
-      trend: 'down',
-      description: 'Increased usage'
-    },
-    {
-      title: 'Active Workflows',
-      value: '34',
-      change: '+5',
-      trend: 'up',
-      description: 'New workflows created'
-    },
-    {
-      title: 'User Satisfaction',
-      value: '4.6/5',
-      change: '+0.2',
-      trend: 'up',
-      description: 'Based on feedback'
-    }
+  // Mock data - would come from API in production
+  const metrics = useMemo(() => {
+    const baseMetrics = {
+      totalPrompts: 1247,
+      avgResponseTime: 2.3,
+      successRate: 96.8,
+      apiCost: 142.50
+    };
+
+    // Adjust metrics based on time range
+    const multipliers = {
+      '24h': 0.1,
+      '7d': 1,
+      '30d': 4,
+      '90d': 12
+    };
+
+    const multiplier = multipliers[timeRange];
+
+    return {
+      totalPrompts: Math.round(baseMetrics.totalPrompts * multiplier),
+      avgResponseTime: baseMetrics.avgResponseTime,
+      successRate: baseMetrics.successRate,
+      apiCost: baseMetrics.apiCost * multiplier
+    };
+  }, [timeRange]);
+
+  const modelUsage: ModelUsage[] = [
+    { name: 'GPT-4', usage: 485, percentage: 39 },
+    { name: 'Claude 3 Opus', usage: 374, percentage: 30 },
+    { name: 'GPT-4 Turbo', usage: 249, percentage: 20 },
+    { name: 'Gemini Pro', usage: 87, percentage: 7 },
+    { name: 'Others', usage: 52, percentage: 4 }
   ];
 
-  const topModels = [
-    { name: 'GPT-4', usage: 45, cost: '$125.30' },
-    { name: 'GPT-3.5 Turbo', usage: 30, cost: '$45.20' },
-    { name: 'Claude 3 Opus', usage: 15, cost: '$62.40' },
-    { name: 'Gemini Pro', usage: 10, cost: '$14.60' }
+  const recentActivities: ActivityLog[] = [
+    { id: '1', type: 'success', message: 'Prompt optimization completed', timestamp: '2 minutes ago', model: 'GPT-4' },
+    { id: '2', type: 'success', message: 'Code review workflow executed', timestamp: '15 minutes ago', model: 'Claude 3' },
+    { id: '3', type: 'warning', message: 'High latency detected (3.8s)', timestamp: '1 hour ago', model: 'GPT-4 Turbo' },
+    { id: '4', type: 'success', message: 'Batch processing completed (50 items)', timestamp: '2 hours ago' },
+    { id: '5', type: 'error', message: 'API rate limit reached', timestamp: '3 hours ago', model: 'Gemini Pro' },
+    { id: '6', type: 'success', message: 'Marketing copy generated', timestamp: '4 hours ago', model: 'GPT-4' },
+    { id: '7', type: 'success', message: 'Data analysis completed', timestamp: '5 hours ago', model: 'Claude 3' },
+    { id: '8', type: 'warning', message: 'Token limit exceeded, truncated', timestamp: '6 hours ago' }
   ];
 
-  const recentActivity = [
-    { time: '2 minutes ago', action: 'Workflow "Customer Onboarding" executed', status: 'success' },
-    { time: '15 minutes ago', action: 'Prompt "Marketing Campaign v2.1" created', status: 'success' },
-    { time: '1 hour ago', action: 'Model comparison completed: GPT-4 vs Claude', status: 'success' },
-    { time: '2 hours ago', action: 'API rate limit warning', status: 'warning' },
-    { time: '3 hours ago', action: 'Batch processing completed (250 prompts)', status: 'success' }
-  ];
-
-  const getTrendIcon = (trend: 'up' | 'down' | 'neutral') => {
-    switch (trend) {
-      case 'up': return '↗';
-      case 'down': return '↘';
-      case 'neutral': return '→';
+  const getStatusIcon = (type: string) => {
+    switch (type) {
+      case 'success': return '✅';
+      case 'warning': return '⚠️';
+      case 'error': return '❌';
+      default: return '📝';
     }
   };
 
-  const getTrendColor = (trend: 'up' | 'down' | 'neutral') => {
-    switch (trend) {
-      case 'up': return '#28a745';
-      case 'down': return '#dc3545';
-      case 'neutral': return '#6c757d';
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
+  const getStatusColor = (type: string) => {
+    switch (type) {
       case 'success': return '#28a745';
       case 'warning': return '#ffc107';
       case 'error': return '#dc3545';
@@ -99,183 +86,161 @@ const AnalyticsPage: React.FC = () => {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <div>
-          <h2 style={{ margin: 0 }}>Analytics & Metrics</h2>
-          <p style={{ margin: '5px 0 0 0', color: '#666' }}>
-            Comprehensive performance tracking and insights
-          </p>
+        <h2>📊 Analytics & Metrics</h2>
+        
+        {/* Time Range Filter */}
+        <div style={{ display: 'flex', gap: '5px' }}>
+          {(['24h', '7d', '30d', '90d'] as TimeRange[]).map(range => (
+            <button
+              key={range}
+              onClick={() => setTimeRange(range)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: timeRange === range ? '#007bff' : 'white',
+                color: timeRange === range ? 'white' : '#212529',
+                border: '1px solid #dee2e6',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: timeRange === range ? '600' : '400'
+              }}
+            >
+              {range}
+            </button>
+          ))}
         </div>
-        <select 
-          value={timeRange} 
-          onChange={(e) => setTimeRange(e.target.value)}
-          style={{ 
-            padding: '8px 12px', 
-            borderRadius: '4px', 
-            border: '1px solid #ccc',
-            fontSize: '14px'
-          }}
-        >
-          <option value="24h">Last 24 Hours</option>
-          <option value="7d">Last 7 Days</option>
-          <option value="30d">Last 30 Days</option>
-          <option value="90d">Last 90 Days</option>
-        </select>
       </div>
 
-      {/* Key Metrics Grid */}
+      {/* Key Metrics */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
         gap: '20px',
         marginBottom: '30px'
       }}>
-        {metrics.map((metric, idx) => (
-          <div 
-            key={idx}
-            style={{ 
-              border: '1px solid #e9ecef', 
-              padding: '20px', 
-              borderRadius: '8px', 
-              backgroundColor: 'white'
-            }}
-          >
-            <div style={{ fontSize: '0.85em', color: '#666', marginBottom: '8px' }}>
-              {metric.title}
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #e9ecef',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '8px' }}>Total Prompts Executed</div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#212529' }}>{metrics.totalPrompts.toLocaleString()}</div>
+          <div style={{ fontSize: '12px', color: '#28a745', marginTop: '8px' }}>↑ 12% from previous period</div>
+        </div>
+
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #e9ecef',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '8px' }}>Avg Response Time</div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#212529' }}>{metrics.avgResponseTime}s</div>
+          <div style={{ fontSize: '12px', color: '#28a745', marginTop: '8px' }}>↓ 8% faster</div>
+        </div>
+
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #e9ecef',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '8px' }}>Success Rate</div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#212529' }}>{metrics.successRate}%</div>
+          <div style={{ fontSize: '12px', color: '#28a745', marginTop: '8px' }}>↑ 2.3% improvement</div>
+        </div>
+
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #e9ecef',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '8px' }}>API Costs</div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#212529' }}>${metrics.apiCost.toFixed(2)}</div>
+          <div style={{ fontSize: '12px', color: '#dc3545', marginTop: '8px' }}>↑ 5% from previous period</div>
+        </div>
+      </div>
+
+      {/* Top Models by Usage */}
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        border: '1px solid #e9ecef',
+        marginBottom: '30px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      }}>
+        <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Top Models by Usage</h3>
+        {modelUsage.map((model, index) => (
+          <div key={index} style={{ marginBottom: '15px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+              <span style={{ fontSize: '14px', fontWeight: '500' }}>{model.name}</span>
+              <span style={{ fontSize: '14px', color: '#6c757d' }}>
+                {model.usage} runs ({model.percentage}%)
+              </span>
             </div>
-            <div style={{ fontSize: '2em', fontWeight: 'bold', marginBottom: '8px' }}>
-              {metric.value}
-            </div>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '5px',
-              fontSize: '0.9em',
-              color: getTrendColor(metric.trend)
+            <div style={{
+              width: '100%',
+              height: '8px',
+              backgroundColor: '#e9ecef',
+              borderRadius: '4px',
+              overflow: 'hidden'
             }}>
-              <span style={{ fontSize: '1.2em' }}>{getTrendIcon(metric.trend)}</span>
-              <span>{metric.change}</span>
-            </div>
-            <div style={{ fontSize: '0.8em', color: '#999', marginTop: '5px' }}>
-              {metric.description}
+              <div style={{
+                width: `${model.percentage}%`,
+                height: '100%',
+                backgroundColor: '#007bff',
+                borderRadius: '4px',
+                transition: 'width 0.3s ease'
+              }} />
             </div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '20px' }}>
-        {/* Performance Chart Placeholder */}
-        <div style={{ 
-          border: '1px solid #e9ecef', 
-          padding: '20px', 
-          borderRadius: '8px', 
-          backgroundColor: 'white'
-        }}>
-          <h3 style={{ marginTop: 0 }}>Performance Over Time</h3>
-          <div style={{ 
-            height: '300px', 
-            backgroundColor: '#f8f9fa', 
-            borderRadius: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#666'
-          }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3em', marginBottom: '10px' }}>📊</div>
-              <div>Chart visualization placeholder</div>
-              <div style={{ fontSize: '0.85em', marginTop: '5px' }}>
-                Response times, success rates, and cost trends
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Top Models */}
-        <div style={{ 
-          border: '1px solid #e9ecef', 
-          padding: '20px', 
-          borderRadius: '8px', 
-          backgroundColor: 'white'
-        }}>
-          <h3 style={{ marginTop: 0 }}>Top Models by Usage</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            {topModels.map((model, idx) => (
-              <div key={idx}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                  <span style={{ fontWeight: 'bold' }}>{model.name}</span>
-                  <span style={{ color: '#666', fontSize: '0.9em' }}>{model.cost}</span>
-                </div>
-                <div style={{ 
-                  height: '8px', 
-                  backgroundColor: '#e9ecef', 
-                  borderRadius: '4px',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{ 
-                    width: `${model.usage}%`, 
-                    height: '100%', 
-                    backgroundColor: '#007bff',
-                    transition: 'width 0.3s'
-                  }} />
-                </div>
-                <div style={{ fontSize: '0.75em', color: '#666', marginTop: '2px' }}>
-                  {model.usage}% of total usage
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div style={{ 
-        border: '1px solid #e9ecef', 
-        padding: '20px', 
-        borderRadius: '8px', 
-        backgroundColor: 'white'
+      {/* Recent Activity Feed */}
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        border: '1px solid #e9ecef',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
       }}>
-        <h3 style={{ marginTop: 0 }}>Recent Activity</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {recentActivity.map((activity, idx) => (
-            <div 
-              key={idx}
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                padding: '10px',
+        <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Recent Activity</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {recentActivities.map(activity => (
+            <div
+              key={activity.id}
+              style={{
+                display: 'flex',
+                alignItems: 'start',
+                padding: '12px',
                 backgroundColor: '#f8f9fa',
-                borderRadius: '4px',
-                borderLeft: `3px solid ${getStatusColor(activity.status)}`
+                borderRadius: '6px',
+                borderLeft: `4px solid ${getStatusColor(activity.type)}`
               }}
             >
-              <div style={{ 
-                width: '8px', 
-                height: '8px', 
-                borderRadius: '50%', 
-                backgroundColor: getStatusColor(activity.status),
-                marginRight: '12px'
-              }} />
+              <span style={{ fontSize: '20px', marginRight: '12px' }}>
+                {getStatusIcon(activity.type)}
+              </span>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '0.9em' }}>{activity.action}</div>
-                <div style={{ fontSize: '0.75em', color: '#666', marginTop: '2px' }}>
-                  {activity.time}
+                <div style={{ fontSize: '14px', color: '#212529', marginBottom: '4px' }}>
+                  {activity.message}
+                </div>
+                <div style={{ fontSize: '12px', color: '#6c757d' }}>
+                  {activity.timestamp}
+                  {activity.model && ` • ${activity.model}`}
                 </div>
               </div>
             </div>
           ))}
         </div>
-      </div>
-
-      <div style={{ 
-        marginTop: '20px', 
-        padding: '15px', 
-        backgroundColor: '#f8f9fa', 
-        borderRadius: '8px',
-        fontSize: '0.9em',
-        color: '#666'
-      }}>
-        <strong>Note:</strong> This is a conceptual implementation. In production, these metrics would be 
-        calculated from real usage data, with interactive charts and detailed drill-down capabilities.
       </div>
     </div>
   );
