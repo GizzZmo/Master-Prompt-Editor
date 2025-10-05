@@ -3,7 +3,11 @@ import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
 import DashboardPage from './pages/DashboardPage';
 import { PromptEditorPage } from './pages/PromptEditor/PromptEditorPage';
+import PromptLibraryPage from './pages/PromptLibraryPage';
 import { AIToolkitPage } from './pages/AIToolkit/AIToolkitPage';
+import ModelComparisonPage from './pages/ModelComparisonPage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import HelpPage from './pages/HelpPage';
 import SettingsPage from './pages/SettingsPage';
 import { AIProvider } from './context/AIContext';
 import { ToastProvider } from './context/ToastContext';
@@ -62,9 +66,29 @@ function AppContent() {
                 <PromptEditorPage />
               </PageErrorBoundary>
             } />
+            <Route path="/prompt-library" element={
+              <PageErrorBoundary pageName="Prompt Library">
+                <PromptLibraryPage />
+              </PageErrorBoundary>
+            } />
             <Route path="/ai-toolkit" element={
               <PageErrorBoundary pageName="AI Toolkit">
                 <AIToolkitPage />
+              </PageErrorBoundary>
+            } />
+            <Route path="/model-comparison" element={
+              <PageErrorBoundary pageName="Model Comparison">
+                <ModelComparisonPage />
+              </PageErrorBoundary>
+            } />
+            <Route path="/analytics" element={
+              <PageErrorBoundary pageName="Analytics">
+                <AnalyticsPage />
+              </PageErrorBoundary>
+            } />
+            <Route path="/help" element={
+              <PageErrorBoundary pageName="Help">
+                <HelpPage />
               </PageErrorBoundary>
             } />
             <Route path="/settings" element={
@@ -72,7 +96,6 @@ function AppContent() {
                 <SettingsPage />
               </PageErrorBoundary>
             } />
-            {/* TODO: Add more routes for specific toolkit functionalities */}
           </Routes>
         </div>
       </div>
