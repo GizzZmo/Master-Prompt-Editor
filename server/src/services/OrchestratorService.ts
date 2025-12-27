@@ -6,7 +6,7 @@
 interface AIAgent {
   id: string;
   name: string;
-  model: string;
+  model: string; // Actual model identifier (e.g., 'claude-3-5-sonnet-20240620')
   provider: string;
   isFree: boolean;
   speed: 'Very Fast' | 'Fast' | 'Medium' | 'Slow';
@@ -210,7 +210,7 @@ export class OrchestratorService {
    * Create a new chat session
    */
   private createSession(agentId: string): ChatSession {
-    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     const session: ChatSession = {
       id: sessionId,
       messages: [],
@@ -283,7 +283,7 @@ export class OrchestratorService {
 
     // Add user message to session
     const userMessage: ChatMessage = {
-      id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       type: 'user',
       content: request.message,
       timestamp: new Date().toISOString(),
@@ -299,7 +299,7 @@ export class OrchestratorService {
 
     // Add assistant message to session
     const assistantMessage: ChatMessage = {
-      id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       type: 'assistant',
       content: responseContent,
       timestamp: new Date().toISOString(),
@@ -386,7 +386,7 @@ export class OrchestratorService {
 
     // Add a system message about the switch
     const systemMessage: ChatMessage = {
-      id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       type: 'system',
       content: `Switched to ${agent.name}`,
       timestamp: new Date().toISOString(),

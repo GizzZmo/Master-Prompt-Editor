@@ -2,38 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { sendChatMessage, getChatAgents, clearChatSession, switchChatAgent } from '../utils/api';
 import { useToast } from '../context/toastContextHelpers';
 import Button from '../components/ui/Button';
+import { ChatMessage, AIAgent, ChatResponse } from '../types/ai';
 import '../styles/global.css';
-
-interface ChatMessage {
-  id: string;
-  type: 'user' | 'assistant' | 'system';
-  content: string;
-  timestamp: string;
-  agentId?: string;
-}
-
-interface AIAgent {
-  id: string;
-  name: string;
-  model: string;
-  provider: string;
-  isFree: boolean;
-  speed: 'Very Fast' | 'Fast' | 'Medium' | 'Slow';
-  costPer1kTokens?: string;
-  contextWindow: string;
-  description: string;
-  isAvailable: boolean;
-}
-
-interface ChatResponse {
-  sessionId: string;
-  agentId: string;
-  agentName: string;
-  message: string;
-  timestamp: string;
-  cost?: number;
-  durationMs?: number;
-}
 
 const ChatbotOrchestratorPage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);

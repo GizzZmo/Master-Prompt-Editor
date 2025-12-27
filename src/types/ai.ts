@@ -105,6 +105,8 @@ export interface ChatMessage {
   content: string;
   /** ISO timestamp when the message was created */
   timestamp: string;
+  /** Optional agent ID for assistant/system messages */
+  agentId?: string;
 }
 
 /**
