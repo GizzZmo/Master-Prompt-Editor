@@ -57,6 +57,12 @@ const Sidebar: React.FC = () => {
             </Link>
           </li>
           <li style={{ marginBottom: '8px' }}>
+            <Link to="/chatbot" style={linkStyle('/chatbot')}>
+              <span style={{ fontSize: '18px' }}>💬</span>
+              <span>Chatbot Orchestrator</span>
+            </Link>
+          </li>
+          <li style={{ marginBottom: '8px' }}>
             <Link to="/model-comparison" style={linkStyle('/model-comparison')}>
               <span style={{ fontSize: '18px' }}>🔍</span>
               <span>Model Comparison</span>

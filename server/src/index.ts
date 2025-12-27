@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import aiRoutes from './routes/aiRoutes';
 import promptRoutes from './routes/promptRoutes';
+import chatRoutes from './routes/chatRoutes';
 
 // Security middleware imports
 import { 
@@ -67,6 +68,12 @@ app.use('/api/ai',
 app.use('/api/prompts', 
   promptOperationsRateLimit,
   promptRoutes
+);
+
+app.use('/api/chat',
+  aiGenerationRateLimit,
+  auditAction('chat_request', 'chat_api'),
+  chatRoutes
 );
 
 // Admin/monitoring endpoints

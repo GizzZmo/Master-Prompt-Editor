@@ -9,6 +9,7 @@ import ModelComparisonPage from './pages/ModelComparisonPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import HelpPage from './pages/HelpPage';
 import SettingsPage from './pages/SettingsPage';
+import ChatbotOrchestratorPage from './pages/ChatbotOrchestratorPage';
 import { AIProvider } from './context/AIContext';
 import { ToastProvider } from './context/ToastContext';
 import KeyboardShortcuts from './components/ui/KeyboardShortcuts';
@@ -94,6 +95,11 @@ function AppContent() {
             <Route path="/settings" element={
               <PageErrorBoundary pageName="Settings">
                 <SettingsPage />
+              </PageErrorBoundary>
+            } />
+            <Route path="/chatbot" element={
+              <PageErrorBoundary pageName="Chatbot Orchestrator">
+                <ChatbotOrchestratorPage />
               </PageErrorBoundary>
             } />
           </Routes>
