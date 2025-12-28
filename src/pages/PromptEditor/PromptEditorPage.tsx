@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { usePromptManagement } from '../../hooks/usePromptManagement';
 import { PromptInputArea } from './components/PromptInputArea';
@@ -8,6 +8,7 @@ import { useToast } from '../../context/toastContextHelpers';
 import SearchBar from '../../components/ui/SearchBar';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { exportSinglePrompt } from '../../utils/exportImport';
+import { PromptVersion } from '../../types/prompt';
 
 /**
  * PromptEditorPage provides a comprehensive prompt editing experience with integrated testing.
@@ -26,6 +27,9 @@ export function PromptEditorPage() {
   const [isSaving, setIsSaving] = useState(false);
   // Current content being edited (may differ from saved activePrompt.content)
   const [currentContent, setCurrentContent] = useState<string>('');
+  const [workingVersions, setWorkingVersions] = useState<PromptVersion[]>([]);
+  const [currentVersion, setCurrentVersion] = useState<string>('');
+  const [diffTarget, setDiffTarget] = useState<PromptVersion | null>(null);
   // Search state
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -36,6 +40,9 @@ export function PromptEditorPage() {
   useEffect(() => {
     if (activePrompt) {
       setCurrentContent(activePrompt.content);
+      setWorkingVersions(activePrompt.versions);
+      setCurrentVersion(activePrompt.version);
+      setDiffTarget(null);
     }
   }, [activePrompt]);
 
@@ -49,13 +56,33 @@ export function PromptEditorPage() {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       console.log('Saving content:', newContent);
+      const bumpPatch = (version: string) => {
+        const parts = version.split('.').map((part) => Number.parseInt(part, 10));
+        if (parts.length === 3 && parts.every((n) => Number.isInteger(n))) {
+          const [major, minor, patch] = parts;
+          return `${major}.${minor}.${patch + 1}`;
+        }
+        return `${version}.1`;
+      };
+      const nextVersion = bumpPatch(currentVersion || activePrompt.version || '1.0.0');
+      const newVersion: PromptVersion = {
+        id: `v-${Date.now()}`,
+        promptId: activePrompt.id,
+        version: nextVersion,
+        content: newContent,
+        createdAt: new Date().toISOString(),
+        metadata: { rationale: 'Manual save from editor' },
+      };
+      setWorkingVersions((prev) => [newVersion, ...prev]);
+      setCurrentVersion(nextVersion);
+      setDiffTarget(newVersion);
       showToast('Prompt saved successfully!', 'success');
     } catch (error) {
       showToast('Failed to save prompt', 'error');
     } finally {
       setIsSaving(false);
     }
-  }, [activePrompt, showToast]);
+  }, [activePrompt, showToast, currentVersion]);
 
   /**
    * Updates the current content state when user edits the prompt.
@@ -63,6 +90,23 @@ export function PromptEditorPage() {
    */
   const handleContentChange = (content: string) => {
     setCurrentContent(content);
+  };
+
+  /**
+   * Roll back to a previous version in-memory with human confirmation.
+   */
+  const handleRollback = (version: string) => {
+    const targetVersion = workingVersions.find((v) => v.version === version);
+    if (!targetVersion) {
+      showToast('Version not found', 'error');
+      return;
+    }
+    if (window.confirm(`Rollback to version ${version}? Unsaved changes will be replaced.`)) {
+      setCurrentContent(targetVersion.content);
+      setCurrentVersion(version);
+      setDiffTarget(targetVersion);
+      showToast(`Rolled back to version ${version}`, 'info');
+    }
   };
 
   /**
@@ -88,6 +132,19 @@ export function PromptEditorPage() {
       showToast(`Searching for: ${query}`, 'info');
     }
   };
+
+  const diffRows = useMemo(() => {
+    if (!diffTarget) return [];
+    const currentLines = currentContent.split('\n');
+    const targetLines = diffTarget.content.split('\n');
+    const length = Math.max(currentLines.length, targetLines.length);
+    return Array.from({ length }).map((_, idx) => ({
+      line: idx + 1,
+      current: currentLines[idx] ?? '',
+      target: targetLines[idx] ?? '',
+      changed: (currentLines[idx] ?? '') !== (targetLines[idx] ?? ''),
+    }));
+  }, [currentContent, diffTarget]);
 
   /**
    * Keyboard shortcuts handler
@@ -206,14 +263,47 @@ export function PromptEditorPage() {
           {/* Version Management Panel */}
           <div>
             <PromptVersioningPanel 
-              currentVersion={activePrompt.version}
-              versionHistory={activePrompt.versions.map(v => ({
+              currentVersion={currentVersion || activePrompt.version}
+              versionHistory={workingVersions.map(v => ({
                 version: v.version,
                 date: v.createdAt,
-                rationale: v.metadata?.rationale as string || 'No rationale provided'
+                rationale: (v.metadata?.rationale as string) || 'No rationale provided'
               }))}
-              onRollback={(version) => console.log('Rollback to version:', version)}
+              onRollback={handleRollback}
+              onViewDiff={(version) => {
+                const target = workingVersions.find((v) => v.version === version) ?? null;
+                setDiffTarget(target);
+              }}
             />
+            {diffTarget && (
+              <div style={{ marginTop: '15px', padding: '12px', border: '1px solid #e0e0e0', borderRadius: '8px', background: '#fafafa' }}>
+                <h4 style={{ marginTop: 0 }}>Diff vs. version {diffTarget.version}</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontFamily: 'monospace', fontSize: '0.85em' }}>
+                  <div>
+                    <strong>Current</strong>
+                    <div style={{ border: '1px solid #ddd', borderRadius: '6px', padding: '8px', maxHeight: '220px', overflowY: 'auto' }}>
+                      {diffRows.map((row) => (
+                        <div key={`curr-${row.line}`} style={{ background: row.changed ? '#fff8e1' : 'transparent' }}>
+                          <span style={{ color: '#999' }}>{row.line.toString().padStart(3, ' ')} </span>
+                          <span>{row.current}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <strong>Selected ({diffTarget.version})</strong>
+                    <div style={{ border: '1px solid #ddd', borderRadius: '6px', padding: '8px', maxHeight: '220px', overflowY: 'auto' }}>
+                      {diffRows.map((row) => (
+                        <div key={`old-${row.line}`} style={{ background: row.changed ? '#ffeceb' : 'transparent' }}>
+                          <span style={{ color: '#999' }}>{row.line.toString().padStart(3, ' ')} </span>
+                          <span>{row.target}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

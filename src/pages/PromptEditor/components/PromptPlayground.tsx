@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { generateAIContent } from '../../../utils/api';
 import { ChatMessage } from '../../../types/ai';
+import { estimateCostForModel, getPricingTable } from '../../../utils/providers';
 
 /**
  * Props for the PromptPlayground component
@@ -28,6 +29,16 @@ export function PromptPlayground({ promptContent }: PromptPlaygroundProps) {
   const [error, setError] = useState<string | null>(null);
   // Complete chat conversation history
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+  // Model + token/cost tracking
+  const [selectedModel, setSelectedModel] = useState<string>('gpt-4');
+  const [temperature, setTemperature] = useState<number>(0.7);
+  const [tokenUsage, setTokenUsage] = useState<{ input: number; output: number; total: number }>({
+    input: 0,
+    output: 0,
+    total: 0,
+  });
+  const [estimatedCost, setEstimatedCost] = useState<number>(0);
+  const pricingTable = useMemo(() => getPricingTable(), []);
 
   /**
    * Load chat history from localStorage when component mounts.
@@ -82,6 +93,24 @@ export function PromptPlayground({ promptContent }: PromptPlaygroundProps) {
     setError(null); // Also clear any existing errors
   };
 
+  const estimateTokens = (text: string): number => {
+    const trimmed = text.trim();
+    if (!trimmed) return 0;
+    // Lightweight approximation: ~4 characters per token on average
+    return Math.max(1, Math.ceil(trimmed.length / 4));
+  };
+
+  useEffect(() => {
+    const inputTokens = estimateTokens(`${promptContent}\n\n${userInput}`);
+    const cost = estimateCostForModel(selectedModel, { input: inputTokens, output: tokenUsage.output });
+    setTokenUsage((prev) => ({
+      ...prev,
+      input: inputTokens,
+      total: inputTokens + (prev.output ?? 0),
+    }));
+    setEstimatedCost(cost);
+  }, [promptContent, userInput, selectedModel, tokenUsage.output]);
+
   /**
    * Handles sending a message to the AI and managing the conversation flow.
    * This function:
@@ -111,14 +140,23 @@ export function PromptPlayground({ promptContent }: PromptPlaygroundProps) {
 
     // Combine the prompt template with user input for AI processing
     const fullPrompt = `${promptContent}\n\nUser Input: ${userInput}`.trim();
+    const inputTokens = estimateTokens(fullPrompt);
+    setTokenUsage((prev) => ({
+      ...prev,
+      input: inputTokens,
+      total: inputTokens + (prev.output ?? 0),
+    }));
 
     try {
       // Call AI generation API with combined prompt and default configuration
-      const apiResponse = await generateAIContent(fullPrompt, { model: 'GPT-4', temperature: 0.7 });
+      const apiResponse = await generateAIContent(fullPrompt, { model: selectedModel, temperature });
       
       if (apiResponse.success && apiResponse.data) {
         // Extract AI response text or fallback to full JSON representation
         const aiResponse = apiResponse.data.text || JSON.stringify(apiResponse.data, null, 2);
+        const outputTokens = estimateTokens(aiResponse);
+        setTokenUsage({ input: inputTokens, output: outputTokens, total: inputTokens + outputTokens });
+        setEstimatedCost(estimateCostForModel(selectedModel, { input: inputTokens, output: outputTokens }));
         addMessageToHistory('assistant', aiResponse);
       } else {
         // Handle API errors by adding system message to chat
@@ -143,6 +181,50 @@ export function PromptPlayground({ promptContent }: PromptPlaygroundProps) {
       <h4>Prompt Content (from Editor):</h4>
       <div style={{ border: '1px dashed #ddd', padding: '10px', borderRadius: '5px', minHeight: '80px', maxHeight: '200px', overflowY: 'auto', backgroundColor: '#f9f9f9', marginBottom: '15px', whiteSpace: 'pre-wrap' }}>
         {promptContent || <span style={{color: '#888'}}>No prompt content loaded. Select or create a prompt.</span>}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <span style={{ fontWeight: 600 }}>Model</span>
+          <select
+            value={selectedModel}
+            onChange={(e) => setSelectedModel(e.target.value)}
+            style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }}
+          >
+            {pricingTable.map((pricing) => (
+              <option key={pricing.model} value={pricing.model}>
+                {pricing.model} ({pricing.provider})
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <span style={{ fontWeight: 600 }}>Temperature: {temperature.toFixed(2)}</span>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={temperature}
+            onChange={(e) => setTemperature(Number(e.target.value))}
+          />
+        </label>
+      </div>
+
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
+        <div style={{ padding: '8px 10px', background: '#eef6ff', borderRadius: '8px' }}>
+          <strong>Input tokens:</strong> {tokenUsage.input}
+        </div>
+        <div style={{ padding: '8px 10px', background: '#eef6ff', borderRadius: '8px' }}>
+          <strong>Output tokens:</strong> {tokenUsage.output}
+        </div>
+        <div style={{ padding: '8px 10px', background: '#e8f5e9', borderRadius: '8px' }}>
+          <strong>Total:</strong> {tokenUsage.total}
+        </div>
+        <div style={{ padding: '8px 10px', background: '#fff3cd', borderRadius: '8px' }}>
+          <strong>Est. cost:</strong> ${estimatedCost.toFixed(4)}
+        </div>
       </div>
 
       {/* Chat History Section - Only displayed when there are messages */}

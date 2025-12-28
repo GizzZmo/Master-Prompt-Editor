@@ -26,6 +26,45 @@ export interface AIConfig {
 }
 
 /**
+ * Pricing configuration for a single AI model.
+ * Values are expressed as cost per 1K tokens.
+ */
+export interface AIModelPricing {
+  model: string;
+  provider: string;
+  inputCostPer1k: number;
+  outputCostPer1k: number;
+}
+
+/**
+ * Interface for pluggable AI providers.
+ * This enables a modular, dependency-injected architecture for adding new models.
+ */
+export interface AIProvider {
+  /** Stable identifier for the provider (e.g., 'openai', 'anthropic', 'google') */
+  id: string;
+  /** Human-readable provider name */
+  name: string;
+  /** Models supported by this provider */
+  models: AIModelPricing[];
+  /** Whether the provider can run multiple models in parallel for A/B tests */
+  supportsParallel?: boolean;
+  /** Optional capability flags for future expansion */
+  capabilities?: string[];
+  /**
+   * Generate content with the provider. The return type is intentionally loose to support diverse responses.
+   */
+  generate: (
+    prompt: string,
+    options: Partial<AIConfig>
+  ) => Promise<{ text: string; raw?: unknown; tokenUsage?: { input: number; output: number } }>;
+  /**
+   * Estimate cost for a token budget so the UI can render live cost calculators without calling the provider.
+   */
+  estimateCost: (model: string, tokenUsage: { input: number; output: number }) => number;
+}
+
+/**
  * Individual step in an AI workflow
  */
 export interface AIWorkflowStep {

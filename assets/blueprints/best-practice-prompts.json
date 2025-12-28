@@ -1,0 +1,20 @@
+[
+  {
+    "id": "safety-review",
+    "title": "Human-in-the-loop Safety Review",
+    "tags": ["safety", "review", "governance"],
+    "prompt": "You are a safety controller that blocks any command that writes to disk, executes binaries, or deletes data. Ask for explicit confirmation and list the perceived risks before allowing execution."
+  },
+  {
+    "id": "ab-test-template",
+    "title": "A/B Prompt Evaluation",
+    "tags": ["evaluation", "experimentation"],
+    "prompt": "Run the same user request through {{model_a}} and {{model_b}}, capture latency, token usage, and summarize which model produced the more faithful answer. Include a short diff of the responses."
+  },
+  {
+    "id": "structured-extraction",
+    "title": "Structured JSON Extraction",
+    "tags": ["data", "json"],
+    "prompt": "Extract entities from the text and return strict JSON with fields: name, type, sentiment, confidence. Do not add commentary. Validate that all fields are present before returning."
+  }
+]

@@ -10,12 +10,14 @@ interface PromptVersioningPanelProps {
   currentVersion: string;
   versionHistory: VersionHistoryItem[];
   onRollback: (version: string) => void;
+  onViewDiff?: (version: string) => void;
 }
 
 export function PromptVersioningPanel({
   currentVersion,
   versionHistory,
   onRollback,
+  onViewDiff,
 }: PromptVersioningPanelProps) {
   return (
     <div>
@@ -42,19 +44,29 @@ export function PromptVersioningPanel({
                 <strong>Version: {v.version}</strong>
                 <small>Date: {new Date(v.date).toLocaleString()}</small>
                 <small>Rationale: {v.rationale}</small>
-                {v.version !== currentVersion && (
-                  <button
-                    onClick={() => onRollback(v.version)}
-                    style={{ backgroundColor: 'var(--secondary-color)', padding: '5px 10px', fontSize: '0.8em' }}
-                  >
-                    Rollback to This Version
-                  </button>
-                )}
-              </li>
-            ))
-          )}
-        </ul>
-      </div>
+                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                   {v.version !== currentVersion && (
+                     <button
+                       onClick={() => onRollback(v.version)}
+                       style={{ backgroundColor: 'var(--secondary-color)', padding: '5px 10px', fontSize: '0.8em' }}
+                     >
+                       Rollback
+                     </button>
+                   )}
+                   {onViewDiff && (
+                     <button
+                       onClick={() => onViewDiff(v.version)}
+                       style={{ backgroundColor: '#f8f9fa', padding: '5px 10px', fontSize: '0.8em', border: '1px solid #ccc' }}
+                     >
+                       View Diff
+                     </button>
+                   )}
+                 </div>
+               </li>
+             ))
+           )}
+         </ul>
+       </div>
     </div>
   );
 }
