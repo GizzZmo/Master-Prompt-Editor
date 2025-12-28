@@ -19,6 +19,7 @@ Thank you for your interest in contributing! Here are some guidelines to help yo
 
 ## Build, Lint, and Test
 
+- Use Node.js 20.x (npm 10.x) to match CI.
 - Install dependencies with `npm run install:all`.
 - Build shared types first: `npx tsc --build src/types`.
 - Run the full build: `npm run build:all`.
