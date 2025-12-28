@@ -223,3 +223,82 @@ export const evaluatePrompt = async (promptId: string, evaluationResult: PromptE
     };
   }
 };
+
+// Chat API functions
+export const sendChatMessage = async (
+  message: string,
+  sessionId?: string,
+  agentId?: string,
+  context?: Record<string, unknown>
+): Promise<{ success: boolean; data?: unknown; error?: string }> => {
+  try {
+    const response = await request<unknown>('/chat/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, sessionId, agentId, context }),
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
+    };
+  }
+};
+
+export const getChatAgents = async (): Promise<{ success: boolean; data?: unknown; error?: string }> => {
+  try {
+    const response = await request<unknown>('/chat/agents');
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
+    };
+  }
+};
+
+export const getChatSession = async (sessionId: string): Promise<{ success: boolean; data?: unknown; error?: string }> => {
+  try {
+    const response = await request<unknown>(`/chat/sessions/${sessionId}`);
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
+    };
+  }
+};
+
+export const clearChatSession = async (sessionId: string): Promise<{ success: boolean; error?: string }> => {
+  try {
+    await request<unknown>(`/chat/sessions/${sessionId}`, {
+      method: 'DELETE',
+    });
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
+    };
+  }
+};
+
+export const switchChatAgent = async (
+  sessionId: string,
+  agentId: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    await request<unknown>(`/chat/sessions/${sessionId}/switch-agent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ agentId }),
+    });
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
+    };
+  }
+};

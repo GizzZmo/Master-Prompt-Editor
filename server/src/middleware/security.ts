@@ -75,6 +75,8 @@ export const corsOptions = {
     
     // In production, only allow specific origins
     const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
       'https://your-domain.com',
       'https://www.your-domain.com',
       // Add your production domains here

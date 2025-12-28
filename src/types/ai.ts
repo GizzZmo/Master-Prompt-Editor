@@ -13,7 +13,7 @@ export type {
 /**
  * Supported AI model types for the toolkit
  */
-export type AIModelType = 'GPT-4' | 'GPT-3.5' | 'DALL-E 3' | 'Whisper' | 'Llama 3' | 'Claude' | 'Gemini';
+export type AIModelType = 'GPT-4' | 'GPT-3.5' | 'DALL-E 3' | 'Whisper' | 'Llama 3' | 'Claude' | 'Claude-3.5-Sonnet' | 'Gemini';
 
 /**
  * Configuration for AI model settings
@@ -105,6 +105,8 @@ export interface ChatMessage {
   content: string;
   /** ISO timestamp when the message was created */
   timestamp: string;
+  /** Optional agent ID for assistant/system messages */
+  agentId?: string;
 }
 
 /**
@@ -122,4 +124,79 @@ export interface ChatSession {
   createdAt: string;
   /** When the session was last modified */
   updatedAt: string;
+}
+
+/**
+ * AI Agent configuration for the orchestrator.
+ * Each agent represents a different AI model with specific capabilities.
+ */
+export interface AIAgent {
+  /** Unique identifier for the agent */
+  id: string;
+  /** Display name of the agent */
+  name: string;
+  /** Underlying AI model type */
+  model: AIModelType;
+  /** Provider (e.g., 'OpenAI', 'Anthropic', 'Meta') */
+  provider: string;
+  /** Whether this agent is free to use */
+  isFree: boolean;
+  /** Estimated response speed (e.g., 'Fast', 'Medium', 'Slow') */
+  speed: 'Very Fast' | 'Fast' | 'Medium' | 'Slow';
+  /** Cost per 1000 tokens (input/output) */
+  costPer1kTokens?: string;
+  /** Maximum context window size */
+  contextWindow: string;
+  /** Brief description of the agent's capabilities */
+  description: string;
+  /** Whether the agent is currently available */
+  isAvailable: boolean;
+}
+
+/**
+ * Configuration for the chatbot orchestrator.
+ */
+export interface OrchestratorConfig {
+  /** Default agent to use when starting a conversation */
+  defaultAgentId: string;
+  /** Whether to auto-select the best agent based on task */
+  autoSelectAgent: boolean;
+  /** Maximum conversation history to maintain */
+  maxHistoryLength: number;
+  /** Whether to log all agent interactions */
+  enableLogging: boolean;
+}
+
+/**
+ * Request to send a message through the orchestrator.
+ */
+export interface ChatRequest {
+  /** The user's message */
+  message: string;
+  /** Optional session ID to continue an existing conversation */
+  sessionId?: string;
+  /** Optional specific agent to use (otherwise uses orchestrator logic) */
+  agentId?: string;
+  /** Optional context or additional parameters */
+  context?: Record<string, unknown>;
+}
+
+/**
+ * Response from the orchestrator containing the agent's reply.
+ */
+export interface ChatResponse {
+  /** Session ID for this conversation */
+  sessionId: string;
+  /** The agent that generated this response */
+  agentId: string;
+  /** Agent's display name */
+  agentName: string;
+  /** The response message */
+  message: string;
+  /** Timestamp of the response */
+  timestamp: string;
+  /** Approximate cost of this interaction */
+  cost?: number;
+  /** Time taken to generate response (in ms) */
+  durationMs?: number;
 }
