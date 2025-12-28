@@ -119,8 +119,8 @@ This project is structured as a monorepo containing both a frontend (React/TypeS
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
-- npm (v7 or higher)
+- Node.js 20.x
+- npm 10.x (bundled with Node.js 20)
 
 ### Installation
 
@@ -132,15 +132,9 @@ This project is structured as a monorepo containing both a frontend (React/TypeS
 
 2. **Install dependencies:**
    ```bash
-   # Install root dependencies
-   npm install
-
-   # Install server dependencies
-   npm install --prefix server
-
-   # Install client dependencies (if using alternative client)
-   npm install --prefix client
+   npm run install:all
    ```
+   This installs root, server, and client dependencies in one step.
 
 ### Development
 
@@ -166,9 +160,16 @@ This project is structured as a monorepo containing both a frontend (React/TypeS
    - Frontend: http://localhost:3000 (or the port shown in terminal)
    - Backend API: http://localhost:3001 (or configured port)
 
+### Environment Variables
+
+The frontend is built with Vite, so environment variables must be read from `import.meta.env` (for example, `import.meta.env.VITE_API_URL`). Using `process.env` will not work in the browser bundle.
+
 ### Building for Production
 
 ```bash
+# Build shared types first (required for server compilation)
+npx tsc --build src/types
+
 # Build all components
 npm run build:all
 
@@ -187,6 +188,15 @@ npm run lint:all
 # Preview production build
 npm run preview
 ```
+
+## Validation Checklist
+
+- Build shared types: `npx tsc --build src/types`
+- Full build: `npm run build:all`
+- Lint: `npm run lint:all`
+- Manual smoke test:
+  - Start backend: `npm run dev:server` and verify `curl http://localhost:3001/health` returns `{"status":"ok"}`.
+  - Start frontend: `npm run dev:frontend`, visit http://localhost:3000, and navigate between Dashboard, Master Prompt Editor, and Advanced AI Toolkit. Press `Ctrl + /` to confirm the shortcuts panel appears.
 
 ## Security & Performance
 
