@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Button from '../components/ui/Button';
 import { useToast } from '../context/toastContextHelpers';
+import { estimateCostForModel, getPricingTable } from '../utils/providers';
 
 interface AIModel {
   id: string;
@@ -96,11 +97,21 @@ const MODELS: AIModel[] = [
   }
 ];
 
+interface ComparisonResult {
+  modelId: string;
+  response: string;
+  tokens: number;
+  cost: number;
+  latencyMs: number;
+}
+
 const ModelComparisonPage: React.FC = () => {
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [testPrompt, setTestPrompt] = useState('');
   const [showTestResults, setShowTestResults] = useState(false);
+  const [comparisonResults, setComparisonResults] = useState<ComparisonResult[]>([]);
   const { showToast } = useToast();
+  const pricingTable = useMemo(() => getPricingTable(), []);
 
   const toggleModelSelection = (modelId: string) => {
     setSelectedModels(prev => {
@@ -125,8 +136,21 @@ const ModelComparisonPage: React.FC = () => {
       showToast('Please enter a test prompt', 'warning');
       return;
     }
+    const builtResults: ComparisonResult[] = selectedModels.map((modelId) => {
+      const tokenEstimate = Math.max(64, Math.ceil(testPrompt.length / 3));
+      const outputTokens = Math.ceil(tokenEstimate * 0.6);
+      const cost = estimateCostForModel(modelId, { input: tokenEstimate, output: outputTokens });
+      return {
+        modelId,
+        tokens: tokenEstimate + outputTokens,
+        cost,
+        latencyMs: 300 + Math.floor(Math.random() * 400),
+        response: `[${modelId}] ${testPrompt.slice(0, 120)}...`,
+      };
+    });
+    setComparisonResults(builtResults);
     setShowTestResults(true);
-    showToast('Comparison started! (Mock results)', 'info');
+    showToast('Comparison ready (simulated responses)', 'info');
   };
 
   const selectedModelData = MODELS.filter(m => selectedModels.includes(m.id));
@@ -265,10 +289,35 @@ const ModelComparisonPage: React.FC = () => {
           {showTestResults && (
             <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#fff3cd', borderRadius: '4px' }}>
               <p style={{ margin: 0, color: '#856404' }}>
-                ℹ️ Test comparison feature coming soon! This will send your prompt to selected models and compare their responses.
+                ℹ️ Split-view A/B test: mock responses shown below. Parallel execution support is controlled by the provider registry.
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {comparisonResults.length > 0 && (
+        <div style={{ marginTop: '25px' }}>
+          <h3>Side-by-side Results</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px', marginTop: '10px' }}>
+            {comparisonResults.map((result) => {
+              const modelMeta = pricingTable.find((p) => p.model === result.modelId);
+              return (
+                <div key={result.modelId} style={{ border: '1px solid #e9ecef', borderRadius: '8px', padding: '12px', background: 'white' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <strong>{result.modelId}</strong>
+                    <span style={{ color: '#6c757d' }}>{modelMeta?.provider ?? 'N/A'}</span>
+                  </div>
+                  <p style={{ fontSize: '13px', color: '#555', whiteSpace: 'pre-wrap' }}>{result.response}</p>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
+                    <span style={{ padding: '6px 8px', background: '#eef6ff', borderRadius: '6px', fontSize: '12px' }}>Tokens: {result.tokens}</span>
+                    <span style={{ padding: '6px 8px', background: '#e8f5e9', borderRadius: '6px', fontSize: '12px' }}>Est. cost: ${result.cost.toFixed(4)}</span>
+                    <span style={{ padding: '6px 8px', background: '#fff3cd', borderRadius: '6px', fontSize: '12px' }}>Latency: {result.latencyMs}ms</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

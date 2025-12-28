@@ -104,6 +104,14 @@ interface AIResponse {
  * ```
  */
 export const generateAIContent = async (prompt: string, config: AIConfig): Promise<AIResponse> => {
+  const dangerousPatterns = [/rm -rf/i, /drop\s+table/i, /curl\s+.+\|\s+sh/i];
+  const requiresConfirmation = dangerousPatterns.some((pattern) => pattern.test(prompt));
+  if (requiresConfirmation && typeof window !== 'undefined') {
+    const proceed = window.confirm('This prompt looks like it could execute a dangerous command. Continue?');
+    if (!proceed) {
+      return { success: false, error: 'User aborted due to safety confirmation' };
+    }
+  }
   try {
     const response = await request<{ text: string }>('/ai/generate', {
       method: 'POST',
