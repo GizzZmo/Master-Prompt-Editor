@@ -8,27 +8,42 @@ export function usePromptManagement(initialPromptId: string | null) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch prompts on mount and whenever initialPromptId changes
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    setError(null);
+    api.getPrompts()
+      .then(allPrompts => {
+        if (cancelled) return;
+        setPrompts(allPrompts);
+        if (initialPromptId) {
+          const found = allPrompts.find((p: Prompt) => p.id === initialPromptId);
+          setActivePrompt(found || null);
+        }
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : 'Failed to fetch prompts');
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [initialPromptId]);
+
   const fetchPrompts = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const allPrompts = await api.getPrompts();
       setPrompts(allPrompts);
-      if (initialPromptId) {
-        const foundPrompt = allPrompts.find((p: Prompt) => p.id === initialPromptId);
-        setActivePrompt(foundPrompt || null);
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch prompts');
     } finally {
       setIsLoading(false);
     }
-  }, [initialPromptId]);
-
-  // Fetch prompts on mount
-  useEffect(() => {
-    fetchPrompts();
-  }, [fetchPrompts]);
+  }, []);
 
   const selectPrompt = useCallback((prompt: Prompt | null) => {
     setActivePrompt(prompt);

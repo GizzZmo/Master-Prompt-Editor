@@ -34,6 +34,8 @@ export function PromptEditorPage() {
 
   // Search in prompt list
   const [listSearch, setListSearch] = useState('');
+  // Track hovered prompt for hover styling
+  const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
 
   /** Synchronize local content state with the active prompt when it changes. */
   useEffect(() => {
@@ -264,16 +266,20 @@ export function PromptEditorPage() {
             <div
               key={prompt.id}
               onClick={() => selectPrompt(prompt)}
+              onMouseEnter={() => setHoveredPromptId(prompt.id)}
+              onMouseLeave={() => setHoveredPromptId(null)}
               style={{
                 padding: '10px 12px',
                 cursor: 'pointer',
                 borderBottom: '1px solid #e9ecef',
-                backgroundColor: activePrompt?.id === prompt.id ? '#e3f2fd' : 'transparent',
+                backgroundColor: activePrompt?.id === prompt.id
+                  ? '#e3f2fd'
+                  : hoveredPromptId === prompt.id
+                  ? '#f0f0f0'
+                  : 'transparent',
                 borderLeft: activePrompt?.id === prompt.id ? '3px solid #007bff' : '3px solid transparent',
                 transition: 'background 0.15s',
               }}
-              onMouseEnter={e => { if (activePrompt?.id !== prompt.id) e.currentTarget.style.backgroundColor = '#f0f0f0'; }}
-              onMouseLeave={e => { if (activePrompt?.id !== prompt.id) e.currentTarget.style.backgroundColor = 'transparent'; }}
             >
               <div style={{ fontWeight: '600', fontSize: '13px', color: '#212529', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {prompt.name}

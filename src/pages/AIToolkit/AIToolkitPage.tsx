@@ -25,10 +25,17 @@ interface GeneratePayload {
   config: AIConfig;
 }
 
+const OVERVIEW_CARDS = [
+  { id: 'manager' as TabId, icon: '🤖', title: 'AI Manager', desc: 'Monitor model status, view execution logs, and track system performance metrics.' },
+  { id: 'workflow' as TabId, icon: '⚙️', title: 'Workflow Builder', desc: 'Design and execute multi-step AI pipelines with no-code/low-code orchestration.' },
+  { id: 'multimodal' as TabId, icon: '🎨', title: 'Multimodal Input', desc: 'Combine text, images, audio, and video in a unified AI generation workflow.' },
+];
+
 export function AIToolkitPage() {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [generateResult, setGenerateResult] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [hoveredCardId, setHoveredCardId] = useState<TabId | null>(null);
 
   const handleGenerate = async (payload: GeneratePayload) => {
     setIsGenerating(true);
@@ -87,30 +94,20 @@ export function AIToolkitPage() {
       {activeTab === 'overview' && (
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
-            {[
-              { icon: '🤖', title: 'AI Manager', desc: 'Monitor model status, view execution logs, and track system performance metrics.', tab: 'manager' as TabId },
-              { icon: '⚙️', title: 'Workflow Builder', desc: 'Design and execute multi-step AI pipelines with no-code/low-code orchestration.', tab: 'workflow' as TabId },
-              { icon: '🎨', title: 'Multimodal Input', desc: 'Combine text, images, audio, and video in a unified AI generation workflow.', tab: 'multimodal' as TabId },
-            ].map(card => (
+            {OVERVIEW_CARDS.map(card => (
               <div
-                key={card.tab}
-                onClick={() => setActiveTab(card.tab)}
+                key={card.id}
+                onClick={() => setActiveTab(card.id)}
+                onMouseEnter={() => setHoveredCardId(card.id)}
+                onMouseLeave={() => setHoveredCardId(null)}
                 style={{
-                  border: '1px solid #e9ecef',
+                  border: `1px solid ${hoveredCardId === card.id ? '#007bff' : '#e9ecef'}`,
                   borderRadius: '8px',
                   padding: '20px',
                   backgroundColor: 'white',
                   cursor: 'pointer',
+                  boxShadow: hoveredCardId === card.id ? '0 4px 12px rgba(0,0,0,0.15)' : '0 1px 3px rgba(0,0,0,0.1)',
                   transition: 'box-shadow 0.2s, border-color 0.2s',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                  e.currentTarget.style.borderColor = '#007bff';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                  e.currentTarget.style.borderColor = '#e9ecef';
                 }}
               >
                 <div style={{ fontSize: '36px', marginBottom: '12px' }}>{card.icon}</div>
