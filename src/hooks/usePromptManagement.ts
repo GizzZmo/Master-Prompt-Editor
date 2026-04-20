@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { api } from '../utils/api';
 import { Prompt } from '../types/prompt';
 
@@ -25,5 +25,21 @@ export function usePromptManagement(initialPromptId: string | null) {
     }
   }, [initialPromptId]);
 
-  return { prompts, activePrompt, isLoading, error, fetchPrompts };
+  // Fetch prompts on mount
+  useEffect(() => {
+    fetchPrompts();
+  }, [fetchPrompts]);
+
+  const selectPrompt = useCallback((prompt: Prompt | null) => {
+    setActivePrompt(prompt);
+  }, []);
+
+  const createPrompt = useCallback(async (data: Omit<Prompt, 'id' | 'version' | 'versions'>) => {
+    const newPrompt = await api.createPrompt({ ...data, versions: [] });
+    setPrompts(prev => [...prev, newPrompt]);
+    setActivePrompt(newPrompt);
+    return newPrompt;
+  }, []);
+
+  return { prompts, activePrompt, isLoading, error, fetchPrompts, selectPrompt, createPrompt };
 }
