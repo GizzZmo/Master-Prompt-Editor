@@ -1,17 +1,19 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import { useToast } from '../context/toastContextHelpers';
 
 const SettingsPage: React.FC = () => {
   const [modelApiKey, setModelApiKey] = useState('sk-**********');
   const [enableXAI, setEnableXAI] = useState(true);
   const [biasDetectionEnabled, setBiasDetectionEnabled] = useState(true);
   const [dataPrivacyCompliance, setDataPrivacyCompliance] = useState('GDPR, CCPA');
+  const { showToast } = useToast();
 
   const handleSaveSettings = () => {
-    // TODO: Implement actual settings saving (conceptual)
+    // TODO: Implement actual settings saving via API
     console.log('Saving settings:', { modelApiKey, enableXAI, biasDetectionEnabled, dataPrivacyCompliance });
-    alert('Settings saved successfully (conceptual).');
+    showToast('Settings saved successfully!', 'success');
   };
 
   return (
